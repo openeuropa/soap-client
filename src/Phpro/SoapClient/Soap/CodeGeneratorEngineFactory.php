@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Phpro\SoapClient\Soap;
 
-use Http\Discovery\Psr18ClientDiscovery;
 use Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
 use Phpro\SoapClient\Soap\Metadata\MetadataFactory;
 use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
@@ -12,8 +11,8 @@ use Soap\Engine\LazyEngine;
 use Soap\Engine\NoopTransport;
 use Soap\Engine\PartialDriver;
 use Soap\Engine\SimpleEngine;
-use Soap\Psr18Transport\Wsdl\Psr18Loader;
 use Soap\Wsdl\Loader\FlatteningLoader;
+use Soap\Wsdl\Loader\StreamWrapperLoader;
 use Soap\Wsdl\Loader\WsdlLoader;
 use Soap\WsdlReader\Locator\ServiceSelectionCriteria;
 use Soap\WsdlReader\Metadata\Wsdl1MetadataProvider;
@@ -33,7 +32,7 @@ final class CodeGeneratorEngineFactory
         ?SoapVersion $preferredSoapVersion = null,
         ?ParserContext $parserContext = null,
     ): Engine {
-        $loader ??= new FlatteningLoader(Psr18Loader::createForClient(Psr18ClientDiscovery::find()));
+        $loader ??= new FlatteningLoader(new StreamWrapperLoader());
         $metadataOptions ??= MetadataOptions::empty()->withTypesManipulator(
             // Ext-soap is not able to work with duplicate types (see FAQ)
             // Therefore, we decided to combine all duplicate types into 1 big intersected type by default instead.
