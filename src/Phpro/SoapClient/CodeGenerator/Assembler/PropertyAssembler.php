@@ -9,6 +9,7 @@ use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\PropertyGenerator;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\WsdlReader\Metadata\Predicate\IsConsideredNullableType;
 
 /**
  * Class PropertyAssembler
@@ -57,7 +58,8 @@ class PropertyAssembler implements AssemblerInterface
             $propertyGenerator = PropertyGenerator::fromArray([
                 'name' => $property->getName(),
                 'visibility' => $this->options->visibility(),
-                'omitdefaultvalue' => !$this->options->useOptionalValue(),
+                'omitdefaultvalue' => !$this->options->useOptionalValue()
+                    && !(new IsConsideredNullableType())($property->getMeta()),
             ]);
 
             if ($this->options->useDocBlocks()) {

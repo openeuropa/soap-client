@@ -265,6 +265,35 @@ CODE;
         $this->assertEquals($expected, $code);
     }
 
+    /**
+     * @test
+     */
+    function it_assembles_property_with_null()
+    {
+        $assembler = new PropertyAssembler(
+            PropertyAssemblerOptions::create()
+        );
+        $context = $this->createContextWithNullableType();
+        $assembler->assemble($context);
+        $code = $context->getClass()->generate();
+        $expected = <<<CODE
+namespace MyNamespace;
+
+class MyType
+{
+    /**
+     * Type specific docs
+     *
+     * @var null | string
+     */
+    private ?string \$prop1 = null;
+}
+
+CODE;
+
+        $this->assertEquals($expected, $code);
+    }
+
 
     /**
      * @return PropertyContext
@@ -293,6 +322,21 @@ CODE;
                 new MetaProperty('prop1', XsdType::guess('Wrap'))
             ),
         ], new TypeMeta());
+        return new PropertyContext($class, $type, $property);
+    }
+
+    /**
+     * @return PropertyContext
+     */
+    private function createContextWithNullableType()
+    {
+        $class = new ClassGenerator('MyType', 'MyNamespace');
+        $type = new Type('MyNamespace', 'MyType', [
+            $property = Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string')->withMeta(
+                static fn (TypeMeta $meta): TypeMeta => $meta->withDocs('Type specific docs')->withIsNullable(true)
+            ))),
+        ], new TypeMeta());
+
         return new PropertyContext($class, $type, $property);
     }
 }
