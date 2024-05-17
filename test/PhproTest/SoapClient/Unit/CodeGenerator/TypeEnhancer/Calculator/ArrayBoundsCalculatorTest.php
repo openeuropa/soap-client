@@ -27,23 +27,31 @@ class ArrayBoundsCalculatorTest extends TestCase
     {
         yield 'simpleType' => [
             new TypeMeta(),
-            'int<min,max>',
+            'int<0,max>',
         ];
         yield 'array' => [
             (new TypeMeta())->withIsList(true),
-            'int<min,max>',
+            'int<0,max>',
         ];
         yield 'min' => [
             (new TypeMeta())->withIsList(true)->withMinOccurs(1),
-            'int<1,max>',
+            'int<0,max>',
         ];
         yield 'max' => [
             (new TypeMeta())->withIsList(true)->withMaxOccurs(3),
-            'int<min,3>',
+            'int<0,2>',
         ];
         yield 'min-max' => [
             (new TypeMeta())->withIsList(true)->withMinOccurs(1)->withMaxOccurs(3),
-            'int<1,3>',
+            'int<0,2>',
+        ];
+        yield 'max-1' => [
+            (new TypeMeta())->withIsList(true)->withMaxOccurs(1),
+            'int<0,0>',
+        ];
+        yield 'max-0' => [
+            (new TypeMeta())->withIsList(true)->withMaxOccurs(0),
+            'never',
         ];
     }
 }

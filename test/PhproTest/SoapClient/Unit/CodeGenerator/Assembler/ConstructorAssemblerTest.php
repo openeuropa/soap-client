@@ -174,7 +174,7 @@ class MyType
     /**
      * Constructor
      *
-     * @param array<int<min,max>, string> \$prop1
+     * @param array<int<0,max>, string> \$prop1
      */
     public function __construct(array \$prop1)
     {

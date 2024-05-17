@@ -181,7 +181,7 @@ namespace MyNamespace;
 class MyType
 {
     /**
-     * @param array<int<min,max>, string> \$prop1
+     * @param array<int<0,max>, string> \$prop1
      */
     public function setProp1(array \$prop1) : void
     {

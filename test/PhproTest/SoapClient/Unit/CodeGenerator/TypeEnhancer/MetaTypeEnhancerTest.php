@@ -36,19 +36,19 @@ class MetaTypeEnhancerTest extends TestCase
         yield 'array' => [
             (new TypeMeta())->withIsList(true),
             'simple',
-            'array<int<min,max>, simple>',
+            'array<int<0,max>, simple>',
             'array',
         ];
         yield 'min' => [
             (new TypeMeta())->withIsList(true)->withMinOccurs(1),
             'simple',
-            'array<int<1,max>, simple>',
+            'non-empty-array<int<0,max>, simple>',
             'array',
         ];
         yield 'max' => [
             (new TypeMeta())->withIsList(true)->withMaxOccurs(3),
             'simple',
-            'array<int<min,3>, simple>',
+            'array<int<0,2>, simple>',
             'array',
         ];
         yield 'nullable' => [
@@ -60,7 +60,7 @@ class MetaTypeEnhancerTest extends TestCase
         yield 'nullable-array' => [
             (new TypeMeta())->withIsList(true)->withIsNullable(true),
             'simple',
-            'null | array<int<min,max>, simple>',
+            'null | array<int<0,max>, simple>',
             '?array',
         ];
         yield 'enum' => [
@@ -72,13 +72,13 @@ class MetaTypeEnhancerTest extends TestCase
         yield 'enum-list' => [
             (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true),
             'string',
-            "array<int<min,max>, 'a' | 'b'>",
+            "array<int<0,max>, 'a' | 'b'>",
             'array',
         ];
         yield 'nullable-enum-list' => [
             (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true)->withIsNullable(true),
             'string',
-            "null | array<int<min,max>, 'a' | 'b'>",
+            "null | array<int<0,max>, 'a' | 'b'>",
             '?array',
         ];
         yield 'nullable-enum' => [
@@ -130,7 +130,7 @@ class MetaTypeEnhancerTest extends TestCase
                     ['type' => 'int', 'isList' => true, 'namespace' => 'xx'],
                 ]),
             'unionType',
-            "array<int<min,max>, string | list<int>>",
+            "array<int<0,max>, string | list<int>>",
             'array',
         ];
         yield 'nullable-array-of-union-with-list' => [
@@ -143,7 +143,7 @@ class MetaTypeEnhancerTest extends TestCase
                     ['type' => 'int', 'isList' => true, 'namespace' => 'xx'],
                 ]),
             'unionType',
-            "null | array<int<min,max>, string | list<int>>",
+            "null | array<int<0,max>, string | list<int>>",
             '?array',
         ];
     }

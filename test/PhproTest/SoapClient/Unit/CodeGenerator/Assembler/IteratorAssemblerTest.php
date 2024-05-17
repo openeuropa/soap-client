@@ -57,15 +57,15 @@ namespace MyNamespace;
 use IteratorAggregate;
 
 /**
- * @phpstan-implements \IteratorAggregate<int<1,2>, string>
- * @psalm-implements \IteratorAggregate<int<1,2>, string>
+ * @phpstan-implements \IteratorAggregate<int<0,1>, string>
+ * @psalm-implements \IteratorAggregate<int<0,1>, string>
  */
 class MyType implements IteratorAggregate
 {
     /**
      * @return \ArrayIterator|string[]
-     * @phpstan-return \ArrayIterator<int<1,2>, string>
-     * @psalm-return \ArrayIterator<int<1,2>, string>
+     * @phpstan-return \ArrayIterator<int<0,1>, string>
+     * @psalm-return \ArrayIterator<int<0,1>, string>
      */
     public function getIterator() : \ArrayIterator
     {
@@ -98,15 +98,15 @@ namespace MyNamespace;
 use IteratorAggregate;
 
 /**
- * @phpstan-implements \IteratorAggregate<int<min,max>, string>
- * @psalm-implements \IteratorAggregate<int<min,max>, string>
+ * @phpstan-implements \IteratorAggregate<int<0,max>, string>
+ * @psalm-implements \IteratorAggregate<int<0,max>, string>
  */
 class MyType implements IteratorAggregate
 {
     /**
      * @return \ArrayIterator|string[]
-     * @phpstan-return \ArrayIterator<int<min,max>, string>
-     * @psalm-return \ArrayIterator<int<min,max>, string>
+     * @phpstan-return \ArrayIterator<int<0,max>, string>
+     * @psalm-return \ArrayIterator<int<0,max>, string>
      */
     public function getIterator() : \ArrayIterator
     {

@@ -276,7 +276,7 @@ namespace MyNamespace;
 class MyType
 {
     /**
-     * @return array<int<min,max>, string>
+     * @return array<int<0,max>, string>
      */
     public function getProp1() : array
     {

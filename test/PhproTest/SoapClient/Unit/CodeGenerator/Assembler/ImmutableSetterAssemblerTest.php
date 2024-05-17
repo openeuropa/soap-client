@@ -265,7 +265,7 @@ namespace MyNamespace;
 class MyType
 {
     /**
-     * @param array<int<min,max>, string> \$prop1
+     * @param array<int<0,max>, string> \$prop1
      * @return static
      */
     public function withProp1(array \$prop1) : static

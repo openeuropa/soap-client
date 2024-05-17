@@ -222,7 +222,7 @@ namespace MyNamespace;
 class MyType
 {
     /**
-     * @var array<int<min,max>, string>
+     * @var array<int<0,max>, string>
      */
     private array \$prop1;
 }

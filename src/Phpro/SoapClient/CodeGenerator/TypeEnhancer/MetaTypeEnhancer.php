@@ -30,7 +30,10 @@ final class MetaTypeEnhancer implements TypeEnhancer
 
         $isArray = $this->meta->isList()->unwrapOr(false);
         if ($isArray) {
-            $type = 'array<'.(new ArrayBoundsCalculator())($this->meta).', '.$type.'>';
+            $nonEmpty = $this->meta->minOccurs()->unwrapOr(0) > 0;
+            $arrayType = $nonEmpty ? 'non-empty-array' : 'array';
+
+            $type = $arrayType.'<'.(new ArrayBoundsCalculator())($this->meta).', '.$type.'>';
         }
 
         $isNullable = (new IsConsideredNullableType())($this->meta);
