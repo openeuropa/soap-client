@@ -7,16 +7,22 @@ use Soap\Engine\Metadata\Model\TypeMeta;
 
 final class ArrayBoundsCalculator
 {
+    /**
+     * All lists will start from index 0.
+     *
+     * The maximum amount of items in the list will be maxOccurs - 1, since arrays are zero-index based.
+     * Edge cases like -1 (unbounded) and 0 (empty) are handled as well.
+     *
+     * These bounds don't take into account minOccurs, since minOccurs still starts from 0.
+     */
     public function __invoke(TypeMeta $meta): string
     {
-        $min = $meta->minOccurs()
-            ->map(fn (int $min): string => $min === -1 ? 'min' : (string) $min)
-            ->unwrapOr('min');
+        $max = $meta->maxOccurs()->unwrapOr(-1);
 
-        $max = $meta->maxOccurs()
-            ->map(fn (int $max): string => $max === -1 ? 'max' : (string) $max)
-            ->unwrapOr('max');
-
-        return 'int<'.$min.','.$max.'>';
+        return match (true) {
+            $max < 0 => 'int<0,max>',
+            $max === 0 => 'never',
+            default => 'int<0,'.($max - 1).'>'
+        };
     }
 }
