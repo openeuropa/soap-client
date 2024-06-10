@@ -9,15 +9,17 @@ The code generation commands require a configuration file to determine how the S
 use Phpro\SoapClient\CodeGenerator\Config\Config;
 use Phpro\SoapClient\CodeGenerator\Rules;
 use Phpro\SoapClient\CodeGenerator\Assembler;
-use Phpro\SoapClient\Soap\CodeGeneratorEngineFactory;
-use Soap\ExtSoapEngine\ExtSoapOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\Wsdl\Loader\FlatteningLoader;
 use Soap\Wsdl\Loader\StreamWrapperLoader;
 
 return Config::create()
-    ->setEngine(CodeGeneratorEngineFactory::create(
-        'wsdl.xml',
-        new FlatteningLoader(new StreamWrapperLoader())
+    ->setEngine(DefaultEngineFactory::create(
+        EngineOptions::defaults('wsdl.xml')
+            ->withWsdlLoader(new FlatteningLoader(new StreamWrapperLoader()))
     ))
     ->setTypeDestination('src/SoapTypes')
     ->setTypeNamespace('SoapTypes')
@@ -27,6 +29,10 @@ return Config::create()
     ->setClassMapNamespace('Acme\\Classmap')
     ->setClassMapDestination('src/acme/classmap')
     ->setClassMapName('AcmeClassmap')
+    ->setTypeMetadataOptions(
+        MetadataOptions::empty()
+            ->withTypesManipulator(new IntersectDuplicateTypesStrategy())
+    )
     ->addRule(new Rules\AssembleRule(new Assembler\GetterAssembler(
         (new Assembler\GetterAssemblerOptions())
             ->withReturnType()
@@ -52,7 +58,7 @@ Execute `vendor/bin/soap-client generate:config` to start the interactive config
 
 Specify how the code generation tool can talk to SOAP.
 By default, we push a custom engine that deeply parses the WSDL for code generation purpose.
-For loading the WSDL, a PSR-18 based WSDL loader is being used in 'flattening' mode.
+For loading the WSDL, a stream based WSDL loader is being used in 'flattening' mode.
 It is possible to change this to any other configuration you want to use
 and provide additional options like the preferred SOAP version.
 

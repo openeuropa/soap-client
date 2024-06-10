@@ -1,18 +1,32 @@
 # Driver metadata
 
-## Dealing with ext-soap issues
-
 ### Duplicate types
 
-Ext-soap does not add any namespace or unique identifier to the types it knows.
-You can read more about this in the [known ext-soap issues](../known-issues/ext-soap.md#duplicate-typenames) section.
-Therefore, we added some strategies to deal with duplicate types:
+XSDs can have both internal and external types making that the names of the type can be non-unique in a given XML namespace.
+It might not be possible to generate unique types for all types in the WSDL.
+Therefore, we added some strategies to deal with duplicate types by default.
+
+This can be configured in the [client configuration](/docs/code-generation/configuration.md):
 
 **IntersectDuplicateTypesStrategy**
 
-Enabled by default when using `DefaultEngineFactory::create()`.
+Enabled by default when using `Config::create()`.
 
 This duplicate types strategy will merge all duplicate types into one big type which contains all properties.
+
+
+```php
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
+
+return Config::create()
+    //...
+    ->setTypeMetadataOptions(
+        MetadataOptions::empty()->withTypesManipulator(new IntersectDuplicateTypesStrategy())
+    )
+    // ...
+```
 
 **RemoveDuplicateTypesStrategy**
 
@@ -21,16 +35,14 @@ This duplicate types strategy will remove all duplicate types it finds.
 You can overwrite the strategy on the `DefaultEngineFactory` object inside the client factory:
 
 ```php
-<?php
-
-use Phpro\SoapClient\Soap\DefaultEngineFactory;
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;
 use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 
-$engine = DefaultEngineFactory::create(
-    $options, $transport,
-    MetadataOptions::empty()->withTypesManipulator(
-        new RemoveDuplicateTypesStrategy()
+return Config::create()
+    //...
+    ->setTypeMetadataOptions(
+        MetadataOptions::empty()->withTypesManipulator(new RemoveDuplicateTypesStrategy())
     )
-);
+    // ...
 ```

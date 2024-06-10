@@ -22,6 +22,8 @@ final class ReturnType
      */
     private string $namespace;
 
+    private XsdType $xsdType;
+
     private TypeMeta $meta;
 
     /**
@@ -30,11 +32,12 @@ final class ReturnType
      * @param non-empty-string $type
      * @param non-empty-string $namespace
      */
-    public function __construct(string $type, string $namespace, TypeMeta $meta)
+    public function __construct(string $type, string $namespace, XsdType $xsdType)
     {
         $this->type = Normalizer::normalizeDataType($type);
         $this->namespace = Normalizer::normalizeNamespace($namespace);
-        $this->meta = $meta;
+        $this->xsdType = $xsdType;
+        $this->meta = $xsdType->getMeta();
     }
 
     /**
@@ -47,7 +50,7 @@ final class ReturnType
         return new self(
             non_empty_string()->assert($typeName),
             $namespace,
-            $returnType->getMeta()
+            $returnType
         );
     }
     /**
@@ -60,6 +63,11 @@ final class ReturnType
         }
 
         return '\\'.$this->namespace.'\\'.Normalizer::normalizeClassname($this->type);
+    }
+
+    public function getXsdType(): XsdType
+    {
+        return $this->xsdType;
     }
 
     public function getMeta(): TypeMeta

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhproTest\SoapClient\Unit\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes;
+namespace PhproTest\SoapClient\Unit\Soap\Metadata\Manipulators\DuplicateTypes;
 
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorInterface;
 use PHPUnit\Framework\TestCase;
 use Soap\Engine\Metadata\Collection\PropertyCollection;

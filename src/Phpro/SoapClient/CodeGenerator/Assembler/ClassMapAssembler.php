@@ -8,8 +8,8 @@ use Phpro\SoapClient\CodeGenerator\Model\TypeMap;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\MethodGenerator;
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMap;
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMapCollection;
+use Soap\Encoding\ClassMap\ClassMap;
+use Soap\Encoding\ClassMap\ClassMapCollection;
 use Soap\WsdlReader\Metadata\Predicate\IsConsideredScalarType;
 
 /**
@@ -85,9 +85,10 @@ class ClassMapAssembler implements AssemblerInterface
             }
 
             $classMap[] = sprintf(
-                '%snew ClassMap(\'%s\', %s::class),',
+                '%snew ClassMap(\'%s\', \'%s\', %s::class),',
                 $indentation,
-                $type->getXsdName(),
+                $type->getXsdType()->getXmlNamespace(),
+                $type->getXsdType()->getXmlTypeName(),
                 'Type\\'.$type->getName()
             );
         }

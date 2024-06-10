@@ -5,8 +5,8 @@ namespace Phpro\SoapClient\CodeGenerator;
 use Phpro\SoapClient\CodeGenerator\Config\Config;
 use Phpro\SoapClient\CodeGenerator\Context\ConfigContext;
 use Laminas\Code\Generator\FileGenerator;
-use Phpro\SoapClient\Soap\CodeGeneratorEngineFactory;
-use Soap\ExtSoapEngine\ExtSoapOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
 
 /**
  * Class ConfigGenerator
@@ -32,8 +32,8 @@ BODY;
 RULESET;
 
     const ENGINE_BOILERPLATE = <<<EOENGINE
-->setEngine(\$engine = CodeGeneratorEngineFactory::create(
-        '%s'
+->setEngine(\$engine = DefaultEngineFactory::create(
+        EngineOptions::defaults('%s')
     ))
 EOENGINE;
 
@@ -75,8 +75,8 @@ EOENGINE;
         $file->setUse('Phpro\\SoapClient\\CodeGenerator\\Assembler');
         $file->setUse('Phpro\\SoapClient\\CodeGenerator\\Rules');
         $file->setUse(Config::class);
-        $file->setUse(ExtSoapOptions::class);
-        $file->setUse(CodeGeneratorEngineFactory::class);
+        $file->setUse(EngineOptions::class);
+        $file->setUse(DefaultEngineFactory::class);
 
         $body .= $this->parseEngine($file, $context->getWsdl());
         foreach ($context->getSetters() as $name => $value) {

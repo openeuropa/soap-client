@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhproTest\SoapClient\Unit\Soap\ExtSoap\Metadata\Detector;
+namespace PhproTest\SoapClient\Unit\Soap\Metadata\Detector;
 
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Detector\DuplicateTypeNamesDetector;
+use Phpro\SoapClient\Soap\Metadata\Detector\DuplicateTypeNamesDetector;
 use PHPUnit\Framework\TestCase;
 use Soap\Engine\Metadata\Collection\PropertyCollection;
 use Soap\Engine\Metadata\Collection\TypeCollection;

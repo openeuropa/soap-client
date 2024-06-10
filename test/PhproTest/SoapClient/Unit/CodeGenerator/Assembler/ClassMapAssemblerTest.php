@@ -56,15 +56,15 @@ class ClassMapAssemblerTest extends TestCase
 namespace ClassMapNamespace;
 
 use MyNamespace as Type;
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMapCollection;
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMap;
+use Soap\Encoding\ClassMap\ClassMapCollection;
+use Soap\Encoding\ClassMap\ClassMap;
 
 class MyClassMap
 {
-    public static function getCollection() : \Soap\ExtSoapEngine\Configuration\ClassMap\ClassMapCollection
+    public static function getCollection() : \Soap\Encoding\ClassMap\ClassMapCollection
     {
         return new ClassMapCollection(
-            new ClassMap('MyType', Type\MyType::class),
+            new ClassMap('http://my-namespace.com', 'MyType', Type\MyType::class),
         );
     }
 }
@@ -90,7 +90,9 @@ CODE;
                         new MetaProperty('myProperty', XsdType::guess('string'))
                     ),
                 ],
-                new TypeMeta(),
+                (new XsdType('MyType'))
+                    ->withXmlNamespace('http://my-namespace.com')
+                    ->withXmlTypeName('MyType'),
             ),
         ]);
 

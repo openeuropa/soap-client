@@ -1,3 +1,88 @@
+# V3 to V4
+
+**NOTE:** We now require a `psr/cache-implementation` so that the engine (and WSDL parsing) can be cached. Some examples are: `symfony/cache` or `cache/*-adapter`.
+If you don't have a cache implementation installed, you can for example run:
+
+```bash
+composer require symfony/cache
+```
+
+Next, you can upgrade the soap-client:
+
+```bash
+composer require 'phpro/soap-client:^4.0.0' --update-with-dependencies
+```
+
+In V4, the engine factory changed again.
+This will be the final breaking change for the engine factory since we now have a generic way to create it for both runtime and code generation:
+
+Change the engine inside your code generation configuration:
+
+```php
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\Soap\CodeGeneratorEngineFactory;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Soap\Wsdl\Loader\FlatteningLoader;
+use Soap\Wsdl\Loader\StreamWrapperLoader;
+
+return Config::create()
+    ->setEngine($engine = DefaultEngineFactory::create(
+        EngineOptions::defaults('your.wsdl')
+            ->withWsdlLoader(new FlatteningLoader(new StreamWrapperLoader())) // Or a PSR18-based loader ... :))
+    ))
+```
+
+Regenerate classes:
+
+```
+./vendor/bin/soap-client generate:client --config=config/soap-client.php
+./vendor/bin/soap-client generate:classmap --config=config/soap-client.php
+./vendor/bin/soap-client generate:types --config=config/soap-client.php
+./vendor/bin/soap-client generate:clientfactory --config=config/soap-client.php
+```
+
+Change the engine inside your (generated) ClientFactory:
+
+```php
+$engine = DefaultEngineFactory::create(
+    EngineOptions::defaults($wsdl)
+        ->withEncoderRegistry(
+            EncoderRegistry::default()->addClassMapCollection(
+                CalcClassmap::getCollection()
+            )
+        )
+        // If you want to enable WSDL caching:
+        // ->withCache($yourPsr6CachePool)
+        // If you want to use Alternate HTTP settings:
+        // ->withWsdlLoader()
+        // ->withTransport()
+        // If you want specific SOAP setting:
+        // ->withWsdlParserContext()
+        // ->withPreferredSoapVersion()
+);
+```
+
+[More information about the engine options can be found here.](/docs/cli/generate-clientfactory.md)
+
+
+In case you are using a non-default metadata strategy, you can now configure it in the code generation configuration:
+
+```php
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
+
+return Config::create()
+    ->setTypeMetadataOptions(
+        MetadataOptions::empty()->withTypesManipulator(new RemoveDuplicateTypesStrategy())
+    )
+```
+
+[More information about the metadata options can be found here.](/docs/drivers/metadata.md)
+
+
+
 # V2 to V3
 
 ```bash
@@ -254,7 +339,8 @@ Full example on how you can personalize your factory class:
 use Http\Client\Common\PluginClient;
 use Http\Discovery\Psr18ClientDiscovery;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorChain;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorChain;
 use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\ExtSoapEngine\ExtSoapOptions;
 use Soap\ExtSoapEngine\Wsdl\Naming\Md5Strategy;

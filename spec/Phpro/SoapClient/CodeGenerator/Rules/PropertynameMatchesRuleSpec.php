@@ -12,6 +12,7 @@ use Phpro\SoapClient\CodeGenerator\Rules\PropertynameMatchesRule;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 
 /**
  * Class PropertynameMatchesRuleSpec
@@ -44,21 +45,21 @@ class PropertynameMatchesRuleSpec extends ObjectBehavior
 
     function it_can_apply_to_property_context( RuleInterface $subRule, PropertyContext $context)
     {
-        $context->getProperty()->willReturn(new Property('myProperty', 'string', 'ns1', new TypeMeta()));
+        $context->getProperty()->willReturn(new Property('myProperty', 'string', 'ns1', XsdType::create('string')));
         $subRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_not_apply_on_invalid_regex(RuleInterface $subRule, PropertyContext $context)
     {
-        $context->getProperty()->willReturn(new Property('InvalidTypeName', 'string', 'ns1', new TypeMeta()));
+        $context->getProperty()->willReturn(new Property('InvalidTypeName', 'string', 'ns1', XsdType::create('string')));
         $subRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(false);
     }
 
     function it_can_apply_if_subrule_does_not_apply(RuleInterface $subRule, PropertyContext $context)
     {
-        $context->getProperty()->willReturn(new Property('MyProperty', 'string', 'ns1', new TypeMeta()));
+        $context->getProperty()->willReturn(new Property('MyProperty', 'string', 'ns1', XsdType::create('string')));
         $subRule->appliesToContext($context)->willReturn(false);
         $this->appliesToContext($context)->shouldReturn(false);
     }

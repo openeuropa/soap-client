@@ -7,6 +7,7 @@ use Phpro\SoapClient\CodeGenerator\Model\Type;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 
 /**
  * Class TypeSpec
@@ -21,8 +22,8 @@ class TypeSpec extends ObjectBehavior
         $this->beConstructedWith(
             $namespace = 'MyNamespace',
             'myType',
-            [new Property('prop1', 'string', $namespace, new TypeMeta())],
-            new TypeMeta()
+            [new Property('prop1', 'string', $namespace, XsdType::create('string'))],
+            XsdType::create('MyType')
         );
     }
 
@@ -57,7 +58,7 @@ class TypeSpec extends ObjectBehavior
 
     function it_should_not_replace_underscores_in_paths()
     {
-        $this->beConstructedWith('MyNamespace', 'my_type_3_2', ['prop1' => 'string'], new TypeMeta());
+        $this->beConstructedWith('MyNamespace', 'my_type_3_2', ['prop1' => 'string'], XsdType::create('MyType'));
         $this->getFileInfo('my/some_dir')->getPathname()->shouldReturn('my/some_dir/MyType32.php');
     }
 
@@ -66,8 +67,8 @@ class TypeSpec extends ObjectBehavior
         $this->beConstructedWith(
             $namespace = 'MyNamespace',
             'Final',
-            [new Property('xor', 'string', $namespace, new TypeMeta())],
-            new TypeMeta()
+            [new Property('xor', 'string', $namespace, XsdType::create('string'))],
+            XsdType::create('MyType')
         );
 
         $this->getFileInfo('my/some_dir')->getPathname()->shouldReturn('my/some_dir/FinalType.php');

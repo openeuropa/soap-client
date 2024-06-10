@@ -210,7 +210,7 @@ CODE;
                     static fn (TypeMeta $meta): TypeMeta => $meta->withIsList(true)
                 ))
             ),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
 
         $context =  new PropertyContext($class, $type, $property);
         $assembler->assemble($context);
@@ -305,7 +305,7 @@ CODE;
             $property = Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string')->withMeta(
                 static fn (TypeMeta $meta): TypeMeta => $meta->withDocs('Type specific docs')
             ))),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
 
         return new PropertyContext($class, $type, $property);
     }
@@ -321,7 +321,7 @@ CODE;
                 'This\\Is\\My\\Very\\Very\\Long\\Namespace\\And\\Class\\Name\\That\\Should\\Not\\Never\\Ever',
                 new MetaProperty('prop1', XsdType::guess('Wrap'))
             ),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
         return new PropertyContext($class, $type, $property);
     }
 
@@ -335,7 +335,7 @@ CODE;
             $property = Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string')->withMeta(
                 static fn (TypeMeta $meta): TypeMeta => $meta->withDocs('Type specific docs')->withIsNullable(true)
             ))),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
 
         return new PropertyContext($class, $type, $property);
     }

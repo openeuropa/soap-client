@@ -12,10 +12,10 @@ use Http\Discovery\Psr18ClientDiscovery;
 use Phpro\SoapClient\Caller\Caller;
 use Phpro\SoapClient\Caller\EngineCaller;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
 use Phpro\SoapClient\Type\MixedResult;
 use Phpro\SoapClient\Type\MultiArgumentRequest;
 use PHPUnit\Framework\TestCase;
-use Soap\ExtSoapEngine\ExtSoapOptions;
 use Soap\Psr18Transport\Psr18Transport;
 
 class ClientTest extends TestCase
@@ -28,14 +28,16 @@ class ClientTest extends TestCase
         $namingStrategy = new PathNamingStrategy();
         $caller = new EngineCaller(
             DefaultEngineFactory::create(
-                ExtSoapOptions::defaults(FIXTURE_DIR.'/wsdl/functional/calculator.wsdl'),
-                Psr18Transport::createForClient(
-                    new PluginClient(
-                        Psr18ClientDiscovery::find(),
-                        [
-                            new RecordPlugin($namingStrategy, $recorder),
-                            new ReplayPlugin($namingStrategy, $recorder, false),
-                        ]
+              EngineOptions::defaults(FIXTURE_DIR.'/wsdl/functional/calculator.wsdl')
+                ->withTransport(
+                    Psr18Transport::createForClient(
+                        new PluginClient(
+                            Psr18ClientDiscovery::find(),
+                            [
+                                new RecordPlugin($namingStrategy, $recorder),
+                                new ReplayPlugin($namingStrategy, $recorder, false),
+                            ]
+                        )
                     )
                 )
             )

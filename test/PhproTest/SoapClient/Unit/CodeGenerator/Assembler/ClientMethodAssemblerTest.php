@@ -53,7 +53,7 @@ class ClientMethodAssemblerTest extends TestCase
         $method = new ClientMethod(
             'functionName',
             [
-                new Parameter('param', 'ParamType', $typeNamespace, new TypeMeta()),
+                new Parameter('param', 'ParamType', $typeNamespace, XsdType::create('ParamType')),
             ],
             ReturnType::fromMetaData($typeNamespace, XsdType::create('ReturnType')),
             $typeNamespace,
@@ -75,8 +75,8 @@ class ClientMethodAssemblerTest extends TestCase
         $method = new ClientMethod(
             'functionName',
             [
-                new Parameter('param', 'ParamType', $typeNamespace, new TypeMeta()),
-                new Parameter('param2', 'OtherParamType', $typeNamespace, new TypeMeta()),
+                new Parameter('param', 'ParamType', $typeNamespace, XsdType::create('ParamType')),
+                new Parameter('param2', 'OtherParamType', $typeNamespace, XsdType::create('OtherParamType')),
             ],
             ReturnType::fromMetaData($typeNamespace, XsdType::create('ReturnType')),
             $typeNamespace,
@@ -247,7 +247,7 @@ CODE;
         $method = new ClientMethod(
             'Function_name',
             [
-                new Parameter('param', 'param_type', $typeNamespace, new TypeMeta()),
+                new Parameter('param', 'param_type', $typeNamespace, XsdType::create('param_type')),
             ],
             ReturnType::fromMetaData($typeNamespace, XsdType::create('return_type')),
             $typeNamespace,
@@ -316,7 +316,7 @@ CODE;
         $method = new ClientMethod(
             'Function_name',
             [
-                new Parameter('param', 'string', $typeNamespace, (new TypeMeta())->withIsSimple(true)),
+                new Parameter('param', 'string', $typeNamespace, XsdType::create('string')->withMeta(static fn (TypeMeta $meta) => $meta->withIsSimple(true))),
             ],
             ReturnType::fromMetaData($typeNamespace, XsdType::create('ReturnType')),
             $typeNamespace,
@@ -427,8 +427,8 @@ CODE;
         $method = new ClientMethod(
             'functionName',
             [
-                new Parameter('param1', 'string', $typeNamespace, (new TypeMeta())),
-                new Parameter('param2', 'string', $typeNamespace, (new TypeMeta())),
+                new Parameter('param1', 'string', $typeNamespace, XsdType::create('string')),
+                new Parameter('param2', 'string', $typeNamespace, XsdType::create('string')),
             ],
             ReturnType::fromMetaData($typeNamespace, XsdType::create('string')->withMeta(
                 fn (TypeMeta $meta): TypeMeta => $meta->withIsSimple(true)

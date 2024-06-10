@@ -16,73 +16,47 @@ final class InvalidArgumentException extends \InvalidArgumentException
         return new static('You did not configure a soap engine');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
     public static function destinationConfigurationIsMissing(): self
     {
         return new static('You did not configure a destination.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
     public static function invalidConfigFile(): self
     {
         return new static('You have to provide a code-generator config file which returns a ConfigInterface.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function clientNamespaceIsMissing()
+    public static function clientNamespaceIsMissing(): self
     {
         return new static('You did not configure a client namespace.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function typeNamespaceIsMissing()
+    public static function typeNamespaceIsMissing(): self
     {
         return new static('You did not configure a type namespace.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function clientDestinationIsMissing()
+    public static function clientDestinationIsMissing(): self
     {
         return new static('You did not configure a client destination.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function typeDestinationIsMissing()
+    public static function typeDestinationIsMissing(): self
     {
         return new static('You did not configure a type destination.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function classmapNameMissing()
+    public static function classmapNameMissing(): self
     {
         return new static('You did not configure a classmap name.');
     }
 
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function classmapNamespaceMissing()
+    public static function classmapNamespaceMissing(): self
     {
         return new static('You did not configure a classmap namespace.');
     }
-    /**
-     * @return InvalidArgumentException
-     */
-    public static function classmapDestinationMissing()
+
+    public static function classmapDestinationMissing(): self
     {
         return new static('You did not configure a classmap destination.');
     }

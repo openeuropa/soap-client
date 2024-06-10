@@ -6,7 +6,8 @@ use Phpro\SoapClient\Caller\EngineCaller;
 use Phpro\SoapClient\Caller\EventDispatchingCaller;
 use Phpro\SoapClient\CodeGenerator\Context\ClientFactoryContext;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
-use Soap\ExtSoapEngine\ExtSoapOptions;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Soap\Encoding\EncoderRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\FileGenerator;
@@ -21,8 +22,20 @@ class ClientFactoryGenerator implements GeneratorInterface
 {
     const BODY = <<<BODY
 \$engine = DefaultEngineFactory::create(
-    ExtSoapOptions::defaults(\$wsdl, [])
-        ->withClassMap(%2\$s::getCollection())
+    EngineOptions::defaults(\$wsdl)
+        ->withEncoderRegistry(
+            EncoderRegistry::default()->addClassMapCollection(
+                %2\$s::getCollection()
+            )
+        )
+        // If you want to enable WSDL caching:
+        // ->withCache() 
+        // If you want to use Alternate HTTP settings:
+        // ->withWsdlLoader()
+        // ->withTransport()
+        // If you want specific SOAP setting:
+        // ->withWsdlParserContext()
+        // ->withPreferredSoapVersion()
 );
 
 \$eventDispatcher = new EventDispatcher();
@@ -46,9 +59,10 @@ BODY;
         $class->addUse($context->getClassmapFqcn());
         $class->addUse(EventDispatcher::class);
         $class->addUse(DefaultEngineFactory::class);
-        $class->addUse(ExtSoapOptions::class);
+        $class->addUse(EngineOptions::class);
         $class->addUse(EventDispatchingCaller::class);
         $class->addUse(EngineCaller::class);
+        $class->addUse(EncoderRegistry::class);
         $class->addMethodFromGenerator(
             MethodGenerator::fromArray(
                 [
@@ -61,6 +75,10 @@ BODY;
                             'name' => 'wsdl',
                             'type' => 'string',
                         ],
+                    ],
+                    'docblock' => [
+                        'shortdescription' => 'This factory can be used as a starting point '.
+                            'to create your own specialized factory. Feel free to modify.',
                     ],
                 ]
             )

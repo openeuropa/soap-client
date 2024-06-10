@@ -95,7 +95,7 @@ CODE;
         $type = new Type($namespace = 'MyNamespace', 'MyType', [
             Property::fromMetaData($namespace, new MetaProperty('prop1', XsdType::guess('string'))),
             Property::fromMetaData($namespace, new MetaProperty('prop2', XsdType::guess('int'))),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
 
         return new TypeContext($class, $type);
     }

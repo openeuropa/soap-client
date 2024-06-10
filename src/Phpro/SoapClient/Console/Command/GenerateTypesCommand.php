@@ -6,6 +6,7 @@ use Phpro\SoapClient\CodeGenerator\Model\Type;
 use Phpro\SoapClient\CodeGenerator\Model\TypeMap;
 use Phpro\SoapClient\CodeGenerator\TypeGenerator;
 use Phpro\SoapClient\Console\Helper\ConfigHelper;
+use Phpro\SoapClient\Soap\Metadata\MetadataFactory;
 use Phpro\SoapClient\Util\Filesystem;
 use Soap\WsdlReader\Metadata\Predicate\IsConsideredScalarType;
 use SplFileInfo;
@@ -74,7 +75,10 @@ class GenerateTypesCommand extends Command
         $config = $this->getConfigHelper()->load($input);
         $typeMap = TypeMap::fromMetadata(
             non_empty_string()->assert($config->getTypeNamespace()),
-            $config->getEngine()->getMetadata()->getTypes()
+            MetadataFactory::manipulated(
+                $config->getEngine()->getMetadata(),
+                $config->getTypeMetadataOptions()
+            )->getTypes()
         );
         $generator = new TypeGenerator($config->getRuleSet());
 

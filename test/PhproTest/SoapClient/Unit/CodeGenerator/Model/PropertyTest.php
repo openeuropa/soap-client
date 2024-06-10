@@ -19,7 +19,7 @@ class PropertyTest extends TestCase
      */
     public function it_returns_mixed_type_post_php8(): void
     {
-        $property = new Property('test', 'mixed', 'App', new TypeMeta());
+        $property = new Property('test', 'mixed', 'App', XsdType::create('mixed'));
         self::assertEquals('mixed', $property->getPhpType());
         self::assertEquals('mixed', $property->getType());
     }

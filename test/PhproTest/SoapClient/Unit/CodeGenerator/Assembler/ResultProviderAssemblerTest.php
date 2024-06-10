@@ -144,7 +144,7 @@ CODE;
         $class = new ClassGenerator('MyType', 'MyNamespace');
         $type = new Type($namespace = 'MyNamespace', 'MyType', [
             Property::fromMetaData($namespace, new MetaProperty('prop1', XsdType::guess('SomeClass'))),
-        ], new TypeMeta());
+        ], XsdType::create('MyType'));
 
         return new TypeContext($class, $type);
     }

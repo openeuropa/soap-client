@@ -9,6 +9,7 @@ use Phpro\SoapClient\CodeGenerator\Model\Type;
 use PHPUnit\Framework\TestCase;
 use Laminas\Code\Generator\ClassGenerator;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 
 /**
  * Class ExtendingTypeAssemblerTest
@@ -68,7 +69,7 @@ CODE;
     {
         $assembler = new ExtendingTypeAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], new TypeMeta());
+        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType'));
 
         $context = new TypeContext($class, $type);
         $assembler->assemble($context);
@@ -93,11 +94,11 @@ CODE;
     {
         $assembler = new ExtendingTypeAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], (new TypeMeta())->withExtends([
+        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
             'type' => 'string',
             'namespace' => 'xsd',
             'isSimple' => true,
-        ]));
+        ])));
 
         $context = new TypeContext($class, $type);
         $assembler->assemble($context);
@@ -121,10 +122,10 @@ CODE;
     private function createContext()
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], (new TypeMeta())->withExtends([
+        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
             'type' => 'MyBaseType',
             'namespace' => 'xxxx'
-        ]));
+        ])));
 
         return new TypeContext($class, $type);
     }
