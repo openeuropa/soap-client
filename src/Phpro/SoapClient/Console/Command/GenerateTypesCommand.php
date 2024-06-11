@@ -75,10 +75,7 @@ class GenerateTypesCommand extends Command
         $config = $this->getConfigHelper()->load($input);
         $typeMap = TypeMap::fromMetadata(
             non_empty_string()->assert($config->getTypeNamespace()),
-            MetadataFactory::manipulated(
-                $config->getEngine()->getMetadata(),
-                $config->getTypeMetadataOptions()
-            )->getTypes()
+            $config->getManipulatedMetadata()->getTypes(),
         );
         $generator = new TypeGenerator($config->getRuleSet());
 

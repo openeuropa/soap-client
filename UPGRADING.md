@@ -33,6 +33,9 @@ return Config::create()
     ))
 ```
 
+**Note:** In case you are using a custom configuration class by implementing the `ConfigInterface` : this is not supported anymore.
+Since code generation gets complexer and complexer, we decided to make the configuration more strict.
+
 Regenerate classes:
 
 ```
@@ -71,16 +74,14 @@ In case you are using a non-default metadata strategy, you can now configure it 
 ```php
 use Phpro\SoapClient\CodeGenerator\Config\Config;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\RemoveDuplicateTypesStrategy;
-use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 
 return Config::create()
-    ->setTypeMetadataOptions(
-        MetadataOptions::empty()->withTypesManipulator(new RemoveDuplicateTypesStrategy())
+    ->setDuplicateTypeIntersectStrategy(
+        new RemoveDuplicateTypesStrategy()
     )
 ```
 
 [More information about the metadata options can be found here.](/docs/drivers/metadata.md)
-
 
 
 # V2 to V3

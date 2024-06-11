@@ -33,16 +33,15 @@ class ConfigHelper extends Helper
     /**
      * Attempts to load the configuration file, returns it on success
      * @param InputInterface $input
-     * @return ConfigInterface
      */
-    public function load(InputInterface $input): ConfigInterface
+    public function load(InputInterface $input): Config
     {
         $configFile = $input->getOption('config');
         if (!$configFile || !$this->filesystem->fileExists($configFile)) {
             throw InvalidArgumentException::invalidConfigFile();
         }
         $config = include $configFile;
-        if (!$config instanceof ConfigInterface) {
+        if (!$config instanceof Config) {
             throw InvalidArgumentException::invalidConfigFile();
         }
 

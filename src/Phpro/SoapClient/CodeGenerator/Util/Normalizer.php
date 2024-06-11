@@ -29,6 +29,7 @@ class Normalizer
         'callable' => 'callable',
         'iterable' => 'iterable',
         'array' => 'array',
+        'void' => 'mixed',
     ];
 
     /**

@@ -10,15 +10,19 @@ use Phpro\SoapClient\CodeGenerator\Rules\RuleSetInterface;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Phpro\SoapClient\Exception\InvalidArgumentException;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\MethodsManipulatorChain;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\ReplaceMethodTypesManipulator;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\ReplaceTypesManipulator;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\TypeReplacer;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\TypeReplacers;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorChain;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorInterface;
+use Phpro\SoapClient\Soap\Metadata\MetadataFactory;
 use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\Engine\Engine;
+use Soap\Engine\Metadata\Metadata;
 
-/**
- * Class Config
- *
- * @package Phpro\SoapClient\CodeGenerator\Config
- */
-final class Config implements ConfigInterface
+final class Config
 {
     /**
      * @var string
@@ -50,7 +54,11 @@ final class Config implements ConfigInterface
      */
     protected $typeDestination = '';
 
-    protected MetadataOptions $typeMetadataOptions;
+    protected TypesManipulatorInterface $duplicateTypeIntersectStrategy;
+
+    protected TypeReplacer $typeReplacementStrategy;
+
+    protected ?MetadataOptions $metadataOptions;
 
     /**
      * @var RuleSetInterface
@@ -74,12 +82,13 @@ final class Config implements ConfigInterface
 
     public function __construct()
     {
-        $this->typeMetadataOptions = MetadataOptions::empty()->withTypesManipulator(
-            // Working with duplicate types is hard (see FAQ).
-            // Therefore, we decided to combine all duplicate types into 1 big intersected type by default instead.
-            // The resulting type will always be usable, but might contain some additional empty properties.
-            new IntersectDuplicateTypesStrategy()
-        );
+        $this->typeReplacementStrategy = TypeReplacers::defaults();
+
+        // Working with duplicate types is hard (see FAQ).
+        // Therefore, we decided to combine all duplicate types into 1 big intersected type by default instead.
+        // The resulting type will always be usable, but might contain some additional empty properties.
+        $this->duplicateTypeIntersectStrategy = new IntersectDuplicateTypesStrategy();
+
         $this->ruleSet = new RuleSet([
             new Rules\AssembleRule(new Assembler\PropertyAssembler()),
             new Rules\AssembleRule(new Assembler\ClassMapAssembler()),
@@ -259,18 +268,49 @@ final class Config implements ConfigInterface
         return $this;
     }
 
-    public function getTypeMetadataOptions(): MetadataOptions
+    public function getMetadataOptions(): MetadataOptions
     {
-        return $this->typeMetadataOptions;
+        return $this->metadataOptions ?? MetadataOptions::empty()
+            ->withTypesManipulator(
+                new TypesManipulatorChain(
+                    $this->duplicateTypeIntersectStrategy,
+                    new ReplaceTypesManipulator($this->typeReplacementStrategy),
+                )
+            )->withMethodsManipulator(
+                new MethodsManipulatorChain(
+                    new ReplaceMethodTypesManipulator($this->typeReplacementStrategy)
+                )
+            );
     }
 
-    public function setTypeMetadataOptions(MetadataOptions $typeMetadataOptions): self
+    public function getManipulatedMetadata(): Metadata
     {
-        $this->typeMetadataOptions = $typeMetadataOptions;
+        return MetadataFactory::manipulated(
+            $this->getEngine()->getMetadata(),
+            $this->getMetadataOptions()
+        );
+    }
+
+    public function setTypeReplacementStrategy(TypeReplacer $typeReplacementStrategy): self
+    {
+        $this->typeReplacementStrategy = $typeReplacementStrategy;
 
         return $this;
     }
 
+    public function setDuplicateTypeIntersectStrategy(TypesManipulatorInterface $duplicateTypeIntersectStrategy): self
+    {
+        $this->duplicateTypeIntersectStrategy = $duplicateTypeIntersectStrategy;
+
+        return $this;
+    }
+
+    public function setMetadataOptions(MetadataOptions $metadataOptions): self
+    {
+        $this->metadataOptions = $metadataOptions;
+
+        return $this;
+    }
 
     /**
      * @return string

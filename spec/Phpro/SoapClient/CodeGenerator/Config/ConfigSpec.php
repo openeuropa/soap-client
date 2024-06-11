@@ -23,11 +23,6 @@ class ConfigSpec extends ObjectBehavior
         $this->shouldHaveType(Config::class);
     }
 
-    function it_is_a_config_class()
-    {
-        $this->shouldImplement(ConfigInterface::class);
-    }
-
     function it_has_an_engine(Engine $engine)
     {
         $this->setEngine($engine);
