@@ -45,6 +45,9 @@ Regenerate classes:
 ./vendor/bin/soap-client generate:clientfactory --config=config/soap-client.php
 ```
 
+**Note:** The generated code might have slightly changed for your project.
+Validate if you are still using the correct methods in your implementation.
+
 Change the engine inside your (generated) ClientFactory:
 
 ```php
