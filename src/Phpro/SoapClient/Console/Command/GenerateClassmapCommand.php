@@ -5,6 +5,7 @@ namespace Phpro\SoapClient\Console\Command;
 use Phpro\SoapClient\CodeGenerator\ClassMapGenerator;
 use Phpro\SoapClient\CodeGenerator\Model\TypeMap;
 use Phpro\SoapClient\Console\Helper\ConfigHelper;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorChain;
 use Phpro\SoapClient\Util\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -72,9 +73,13 @@ class GenerateClassmapCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $config = $this->getConfigHelper()->load($input);
+        // For class-maps, we don't want to do anything with duplicate types:
+        // All types should be listed with namespace and name, even if that means there will be a duplicate entry.
+        $config->setDuplicateTypeIntersectStrategy(new TypesManipulatorChain());
+
         $typeMap = TypeMap::fromMetadata(
             non_empty_string()->assert($config->getTypeNamespace()),
-            $config->getEngine()->getMetadata()->getTypes()
+            $config->getManipulatedMetadata()->getTypes(),
         );
 
         $generator = new ClassMapGenerator(
@@ -86,7 +91,7 @@ class GenerateClassmapCommand extends Command
         $this->handleClassmap($generator, $typeMap, $path);
 
         $io->success('Generated classmap at ' . $path);
-        
+
         return 0;
     }
 

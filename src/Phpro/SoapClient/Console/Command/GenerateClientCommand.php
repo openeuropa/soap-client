@@ -6,14 +6,14 @@ use Phpro\SoapClient\CodeGenerator\ClientGenerator;
 use Phpro\SoapClient\CodeGenerator\GeneratorInterface;
 use Phpro\SoapClient\CodeGenerator\Model\Client;
 use Phpro\SoapClient\CodeGenerator\Model\ClientMethodMap;
-use Phpro\SoapClient\CodeGenerator\TypeGenerator;
 use Phpro\SoapClient\Console\Helper\ConfigHelper;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorChain;
+use Phpro\SoapClient\Soap\Metadata\MetadataFactory;
 use Phpro\SoapClient\Util\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Laminas\Code\Generator\FileGenerator;
 use function Psl\Type\instance_of;
@@ -77,7 +77,7 @@ class GenerateClientCommand extends Command
         $destination = $config->getClientDestination().'/'.$config->getClientName().'.php';
         $methodMap = ClientMethodMap::fromMetadata(
             non_empty_string()->assert($config->getTypeNamespace()),
-            $config->getEngine()->getMetadata()->getMethods()
+            $config->getManipulatedMetadata()->getMethods(),
         );
 
         $client = new Client(

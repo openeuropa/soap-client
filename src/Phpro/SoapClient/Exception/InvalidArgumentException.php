@@ -23,7 +23,7 @@ final class InvalidArgumentException extends \InvalidArgumentException
 
     public static function invalidConfigFile(): self
     {
-        return new static('You have to provide a code-generator config file which returns a ConfigInterface.');
+        return new static('You have to provide a code-generator config file which returns a Config class instance.');
     }
 
     public static function clientNamespaceIsMissing(): self
