@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes;
+namespace Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes;
 
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorInterface;

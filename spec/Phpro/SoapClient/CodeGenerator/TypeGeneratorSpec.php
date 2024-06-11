@@ -17,6 +17,7 @@ use Prophecy\Argument;
 use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\FileGenerator;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 
 /**
  * Class TypeGeneratorSpec
@@ -47,8 +48,8 @@ class TypeGeneratorSpec extends ObjectBehavior
         $type = new Type(
             $namespace = 'MyNamespace',
             'MyType',
-            [new Property('prop1', 'string', $namespace, new TypeMeta())],
-            new TypeMeta()
+            [new Property('prop1', 'string', $namespace, XsdType::create('string'))],
+            XsdType::create('MyType')
         );
         $property = $type->getProperties()[0];
 
@@ -71,8 +72,8 @@ class TypeGeneratorSpec extends ObjectBehavior
         $type = new Type(
             $namespace = 'MyNamespace',
             'MyType',
-            [new Property('prop1', 'string', $namespace, new TypeMeta())],
-            new TypeMeta()
+            [new Property('prop1', 'string', $namespace, XsdType::create('string'))],
+            XsdType::create('MyType')
         );
         $property = $type->getProperties()[0];
 

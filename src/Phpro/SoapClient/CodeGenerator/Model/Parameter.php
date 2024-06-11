@@ -6,6 +6,7 @@ use Phpro\SoapClient\CodeGenerator\TypeEnhancer\Calculator\TypeNameCalculator;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Soap\Engine\Metadata\Model\Parameter as MetadataParameter;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 use function Psl\Type\non_empty_string;
 
 class Parameter
@@ -25,6 +26,8 @@ class Parameter
      */
     private string $namespace;
 
+    private XsdType $xsdType;
+
     private TypeMeta $meta;
 
     /**
@@ -34,12 +37,13 @@ class Parameter
      * @param non-empty-string $type
      * @param non-empty-string $namespace
      */
-    public function __construct(string $name, string $type, string $namespace, TypeMeta $meta)
+    public function __construct(string $name, string $type, string $namespace, XsdType $xsdType)
     {
         $this->name = Normalizer::normalizeProperty($name);
         $this->type = Normalizer::normalizeDataType($type);
         $this->namespace = Normalizer::normalizeNamespace($namespace);
-        $this->meta = $meta;
+        $this->xsdType = $xsdType;
+        $this->meta = $xsdType->getMeta();
     }
 
     /**
@@ -48,14 +52,13 @@ class Parameter
     public static function fromMetadata(string $parameterNamespace, MetadataParameter $parameter): Parameter
     {
         $type = $parameter->getType();
-        $meta = $type->getMeta();
         $typeName = (new TypeNameCalculator())($type);
 
         return new self(
             non_empty_string()->assert($parameter->getName()),
             non_empty_string()->assert($typeName),
             $parameterNamespace,
-            $meta
+            $type
         );
     }
 
@@ -90,6 +93,16 @@ class Parameter
             'name' => $this->name,
             'type' => $this->getType(),
         ];
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    public function getXsdType(): XsdType
+    {
+        return $this->xsdType;
     }
 
     public function getMeta(): TypeMeta

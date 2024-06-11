@@ -50,7 +50,7 @@ class ClientGeneratorSpec extends ObjectBehavior
     {
         $method = new ClientMethod(
             'Test',
-            [new Parameter('parameters', 'Test', '', new TypeMeta())],
+            [new Parameter('parameters', 'Test', '', XsdType::create('Test'))],
             ReturnType::fromMetaData('', XsdType::create('TestResponse')),
             '',
             new MethodMeta()
@@ -74,7 +74,7 @@ class ClientGeneratorSpec extends ObjectBehavior
     {
         $method = new ClientMethod(
             'Test',
-            [new Parameter('parameters', 'Test', '', new TypeMeta())],
+            [new Parameter('parameters', 'Test', '', XsdType::create('Test'))],
             ReturnType::fromMetaData('', XsdType::create('TestResponse')),
             '',
             new MethodMeta()

@@ -3,6 +3,7 @@
 namespace Phpro\SoapClient\CodeGenerator\Config;
 
 use Phpro\SoapClient\CodeGenerator\Rules\RuleSetInterface;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\Engine\Engine;
 
 /**
@@ -27,6 +28,9 @@ interface ConfigInterface
      * @return string
      */
     public function getTypeDestination();
+
+    public function getTypeMetadataOptions(): MetadataOptions;
+
 
     /**
      * @return RuleSetInterface

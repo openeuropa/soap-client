@@ -44,8 +44,8 @@ Example output:
 
 namespace Myapp\Example\Classmap;
 
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMapCollection;
-use Soap\ExtSoapEngine\Configuration\ClassMap\ClassMap;
+use Soap\Encoding\ClassMap\ClassMapCollection;
+use Soap\Encoding\ClassMap\ClassMap;
 
 class OrderClassMap
 {
@@ -53,9 +53,9 @@ class OrderClassMap
     public static function getCollection() : ClassMapCollection
     {
         return new ClassMapCollection(
-            new ClassMap('CreateOrder', Type\Example1::class),
-            new ClassMap('CardOrder', Type\Example2::class),
-            new ClassMap('OrderDetails', Type\Example3::class)
+            new ClassMap('http://namespace', 'CreateOrder', Type\Example1::class),
+            new ClassMap('http://namespace', 'CardOrder', Type\Example2::class),
+            new ClassMap('http://namespace', 'OrderDetails', Type\Example3::class)
         );
     }
 }

@@ -9,6 +9,7 @@ use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Soap\Engine\Metadata\Metadata;
 use Soap\Engine\Metadata\Model\Property as MetadataProperty;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 use function Psl\Type\non_empty_string;
 
 /**
@@ -33,6 +34,8 @@ class Property
      */
     private $namespace;
 
+    private XsdType $xsdType;
+
     private TypeMeta $meta;
 
     private TypeEnhancer $typeEnhancer;
@@ -44,12 +47,13 @@ class Property
      * @param non-empty-string $type
      * @param non-empty-string $namespace
      */
-    public function __construct(string $name, string $type, string $namespace, TypeMeta $meta)
+    public function __construct(string $name, string $type, string $namespace, XsdType $xsdType)
     {
         $this->name = Normalizer::normalizeProperty($name);
         $this->type = Normalizer::normalizeDataType($type);
         $this->namespace = Normalizer::normalizeNamespace($namespace);
-        $this->meta = $meta;
+        $this->xsdType = $xsdType;
+        $this->meta = $xsdType->getMeta();
         $this->typeEnhancer = new MetaTypeEnhancer($this->meta);
     }
 
@@ -66,7 +70,7 @@ class Property
             non_empty_string()->assert($property->getName()),
             non_empty_string()->assert($typeName),
             $namespace,
-            $meta
+            $type
         );
     }
 
@@ -120,6 +124,11 @@ class Property
     public function setterName(): string
     {
         return Normalizer::generatePropertyMethod('set', $this->getName());
+    }
+
+    public function getXsdType(): XsdType
+    {
+        return $this->xsdType;
     }
 
     public function getMeta(): TypeMeta

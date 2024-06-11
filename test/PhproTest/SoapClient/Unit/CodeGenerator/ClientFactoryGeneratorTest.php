@@ -23,17 +23,34 @@ use App\Client\Myclient;
 use App\Classmap\SomeClassmap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
-use Soap\ExtSoapEngine\ExtSoapOptions;
+use Phpro\SoapClient\Soap\EngineOptions;
 use Phpro\SoapClient\Caller\EventDispatchingCaller;
 use Phpro\SoapClient\Caller\EngineCaller;
+use Soap\Encoding\EncoderRegistry;
 
 class MyclientFactory
 {
+    /**
+     * This factory can be used as a starting point to create your own specialized
+     * factory. Feel free to modify.
+     */
     public static function factory(string \$wsdl) : \App\Client\Myclient
     {
         \$engine = DefaultEngineFactory::create(
-            ExtSoapOptions::defaults(\$wsdl, [])
-                ->withClassMap(SomeClassmap::getCollection())
+            EngineOptions::defaults(\$wsdl)
+                ->withEncoderRegistry(
+                    EncoderRegistry::default()->addClassMapCollection(
+                        SomeClassmap::getCollection()
+                    )
+                )
+                // If you want to enable WSDL caching:
+                // ->withCache() 
+                // If you want to use Alternate HTTP settings:
+                // ->withWsdlLoader()
+                // ->withTransport()
+                // If you want specific SOAP setting:
+                // ->withWsdlParserContext()
+                // ->withPreferredSoapVersion()
         );
 
         \$eventDispatcher = new EventDispatcher();

@@ -17,12 +17,12 @@ class ConfigGeneratorTest extends TestCase
 use Phpro\SoapClient\CodeGenerator\Assembler;
 use Phpro\SoapClient\CodeGenerator\Rules;
 use Phpro\SoapClient\CodeGenerator\Config\Config;
-use Soap\ExtSoapEngine\ExtSoapOptions;
-use Phpro\SoapClient\Soap\CodeGeneratorEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
 
 return Config::create()
-    ->setEngine(\$engine = CodeGeneratorEngineFactory::create(
-        'wsdl.xml'
+    ->setEngine(\$engine = DefaultEngineFactory::create(
+        EngineOptions::defaults('wsdl.xml')
     ))
     ->setTypeDestination('src/type')
     ->setTypeNamespace('App\\\\Type')
@@ -93,12 +93,12 @@ CONTENT;
 use Phpro\SoapClient\CodeGenerator\Assembler;
 use Phpro\SoapClient\CodeGenerator\Rules;
 use Phpro\SoapClient\CodeGenerator\Config\Config;
-use Soap\ExtSoapEngine\ExtSoapOptions;
-use Phpro\SoapClient\Soap\CodeGeneratorEngineFactory;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
 
 return Config::create()
-    ->setEngine(\$engine = CodeGeneratorEngineFactory::create(
-        'wsdl.xml'
+    ->setEngine(\$engine = DefaultEngineFactory::create(
+        EngineOptions::defaults('wsdl.xml')
     ))
     ->addRule(new Rules\AssembleRule(new Assembler\GetterAssembler(
         (new Assembler\GetterAssemblerOptions())->withDocBlocks(false)

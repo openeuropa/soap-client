@@ -6,6 +6,7 @@ use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Soap\Engine\Metadata\Model\Property as MetadataProperty;
 use Soap\Engine\Metadata\Model\Type as MetadataType;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 use SplFileInfo;
 use function Psl\Type\non_empty_string;
 
@@ -36,6 +37,8 @@ class Type
      */
     private $properties = [];
 
+    private XsdType $xsdType;
+
     private TypeMeta $meta;
 
     /**
@@ -45,13 +48,14 @@ class Type
      * @param non-empty-string     $xsdName
      * @param Property[] $properties
      */
-    public function __construct(string $namespace, string $xsdName, array $properties, TypeMeta $meta)
+    public function __construct(string $namespace, string $xsdName, array $properties, XsdType $xsdType)
     {
         $this->namespace = Normalizer::normalizeNamespace($namespace);
         $this->xsdName = $xsdName;
         $this->name = Normalizer::normalizeClassname($xsdName);
         $this->properties = $properties;
-        $this->meta = $meta;
+        $this->xsdType = $xsdType;
+        $this->meta = $xsdType->getMeta();
     }
 
     /**
@@ -71,7 +75,7 @@ class Type
                 },
                 iterator_to_array($type->getProperties())
             ),
-            $type->getXsdType()->getMeta(),
+            $type->getXsdType(),
         );
     }
 
@@ -128,6 +132,11 @@ class Type
     public function getProperties(): array
     {
         return $this->properties;
+    }
+
+    public function getXsdType(): XsdType
+    {
+        return $this->xsdType;
     }
 
     public function getMeta(): TypeMeta

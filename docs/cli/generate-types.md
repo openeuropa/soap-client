@@ -10,7 +10,6 @@ Usage:
 
 Options:
       --config=CONFIG   The location of the soap code-generator config file
-
 ```
 
 This generator will read all XSD types from the provided WSDL and convert it to PHP classes.
@@ -27,7 +26,6 @@ Keep in mind that the WSDL must provide all XSD types for the generation of valu
 Options:
 
 - **config**: A [configuration file](../code-generation/configuration.md) is required to build the types. 
-- **overwrite**: The soap-client overrides a file that cannot be patched without asking for confirmation.
 
 
 When the value objects are generated, you will still need to customize them.

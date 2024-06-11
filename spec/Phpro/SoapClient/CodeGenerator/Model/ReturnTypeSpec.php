@@ -6,6 +6,7 @@ use Phpro\SoapClient\CodeGenerator\Model\ReturnType;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Soap\Engine\Metadata\Model\TypeMeta;
+use Soap\Engine\Metadata\Model\XsdType;
 
 /**
  * Class ReturnTypeSpec
@@ -17,7 +18,7 @@ class ReturnTypeSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->beConstructedWith('Type', 'My\Namespace', new TypeMeta());
+        $this->beConstructedWith('Type', 'My\Namespace', XsdType::create('Type'));
     }
 
     function it_is_initializable()

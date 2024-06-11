@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phpro\SoapClient\Soap\ExtSoap\Metadata\Detector;
+namespace Phpro\SoapClient\Soap\Metadata\Detector;
 
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Soap\Engine\Metadata\Collection\TypeCollection;

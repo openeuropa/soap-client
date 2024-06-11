@@ -1,6 +1,8 @@
 # Generate a base client factory
 
 To make things a little easier to get started a client factory generator method is available.
+The generated factory can be seen as a good starting point to initialize the client.
+It can be customized to your needs.
 
 ```bash
 vendor/bin/soap-client generate:clientfactory
@@ -33,31 +35,49 @@ More advanced client factory:
 
 use Http\Client\Common\PluginClient;
 use Http\Discovery\Psr18ClientDiscovery;
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
-use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
-use Soap\Psr18Transport\Psr18Transport;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Phpro\SoapClient\Soap\ExtSoap\DefaultEngineFactory;
-use Soap\ExtSoapEngine\ExtSoapOptions;
-use Phpro\SoapClient\Caller\EventDispatchingCaller;
 use Phpro\SoapClient\Caller\EngineCaller;
+use Phpro\SoapClient\Caller\EventDispatchingCaller;
+use Phpro\SoapClient\Soap\EngineOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
+use Soap\CachedEngine\CacheConfig;
+use Soap\Encoding\EncoderRegistry;
+use Soap\Psr18Transport\Psr18Transport;
+use Soap\Psr18Transport\Wsdl\Psr18Loader;
+use Soap\Wsdl\Loader\FlatteningLoader;
+use Soap\WsdlReader\Model\Definitions\SoapVersion;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CalculatorClientFactory
 {
     public static function factory(string $wsdl) : CalculatorClient
     {
         $engine = DefaultEngineFactory::create(
-            ExtSoapOptions::defaults($wsdl, [])
-                ->withClassMap(CalculatorClassmap::getCollection()),
-            Psr18Transport::createForClient(
-                new PluginClient(
-                    Psr18ClientDiscovery::find(),
-                    [$plugin1, $plugin2]
+            EngineOptions::defaults($wsdl)
+                ->withEncoderRegistry(
+                    EncoderRegistry::default()
+                        ->addClassMapCollection(CalculatorClassmap::getCollection())
                 )
-            ),
-            MetadataOptions::empty()->withTypesManipulator(
-                new IntersectDuplicateTypesStrategy()
-            )
+                ->withTransport(
+                    Psr18Transport::createForClient(
+                        new PluginClient(
+                            Psr18ClientDiscovery::find(),
+                            [$plugin1, $plugin2]
+                        )
+                    )    
+                )
+                ->withWsdlLoader(
+                    new FlatteningLoader(
+                        new Psr18Loader(Psr18ClientDiscovery::find())
+                    )
+                )
+                ->withCache(
+                    new RedisAdapter(RedisAdapter::createConnection('redis://localhost')),
+                    new CacheConfig('my-wsdl-cache-key', ttlInSeconds: 3600)
+                )
+                ->withPreferredSoapVersion(SoapVersion::SOAP_12)
         );
 
         $eventDispatcher = new EventDispatcher();
@@ -74,7 +94,6 @@ You can then tweak this class to fit your needs.
 
 Here you can find some bookmarks for changing the factory:
 
-- [Configuring ExtSoapOptions](https://github.com/php-soap/ext-soap-engine/#configuration-options)
 - [Listening to events](../events.md)
 - [Configuring the engine](https://github.com/php-soap/engine)
 - [Using HTTP middleware](https://github.com/php-soap/psr18-transport/#middleware) 

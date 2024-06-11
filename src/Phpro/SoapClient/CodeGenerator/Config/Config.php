@@ -9,6 +9,8 @@ use Phpro\SoapClient\CodeGenerator\Rules\RuleSet;
 use Phpro\SoapClient\CodeGenerator\Rules\RuleSetInterface;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Phpro\SoapClient\Exception\InvalidArgumentException;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\Engine\Engine;
 
 /**
@@ -48,6 +50,8 @@ final class Config implements ConfigInterface
      */
     protected $typeDestination = '';
 
+    protected MetadataOptions $typeMetadataOptions;
+
     /**
      * @var RuleSetInterface
      */
@@ -70,6 +74,12 @@ final class Config implements ConfigInterface
 
     public function __construct()
     {
+        $this->typeMetadataOptions = MetadataOptions::empty()->withTypesManipulator(
+            // Working with duplicate types is hard (see FAQ).
+            // Therefore, we decided to combine all duplicate types into 1 big intersected type by default instead.
+            // The resulting type will always be usable, but might contain some additional empty properties.
+            new IntersectDuplicateTypesStrategy()
+        );
         $this->ruleSet = new RuleSet([
             new Rules\AssembleRule(new Assembler\PropertyAssembler()),
             new Rules\AssembleRule(new Assembler\ClassMapAssembler()),
@@ -248,6 +258,19 @@ final class Config implements ConfigInterface
 
         return $this;
     }
+
+    public function getTypeMetadataOptions(): MetadataOptions
+    {
+        return $this->typeMetadataOptions;
+    }
+
+    public function setTypeMetadataOptions(MetadataOptions $typeMetadataOptions): self
+    {
+        $this->typeMetadataOptions = $typeMetadataOptions;
+
+        return $this;
+    }
+
 
     /**
      * @return string

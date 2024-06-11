@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Phpro\SoapClient\Soap\ExtSoap\Metadata\Manipulators\DuplicateTypes;
+namespace Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes;
 
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
+use Phpro\SoapClient\Soap\Metadata\Detector\DuplicateTypeNamesDetector;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorInterface;
-use Phpro\SoapClient\Soap\ExtSoap\Metadata\Detector\DuplicateTypeNamesDetector;
 use Soap\Engine\Metadata\Collection\TypeCollection;
 use Soap\Engine\Metadata\Model\Type;
 use function Psl\Type\non_empty_string;

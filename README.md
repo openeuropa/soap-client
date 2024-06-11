@@ -25,6 +25,7 @@ Want more information about the future of this project? Check out this list of t
 You can choose what HTTP client you want to use.
 This package expects some PSR implementations to be present in order to be installed:
 
+* PSR-6: `psr/cache-implementation` like `symfony/cache` or `cache/*-adapter`
 * PSR-7: `psr/http-message-implementation` like `nyholm/psr7` or `guzzlehttp/psr7`
 * PSR-17: `psr/http-factory-implementation` like `nyholm/psr7` or `guzzlehttp/psr7`
 * PSR-18: `psr/http-client-implementation` like `symfony/http-client` or `guzzlehttp/guzzle`
@@ -73,8 +74,8 @@ You can customize the generated code based on the manual installation pages in t
 - [Get in control of the soap-client](https://github.com/php-soap/engine)
     - [Psr-18 HTTP Transport](https://github.com/php-soap/psr18-transport/)
         - [Configure one or multiple HTTP middlewares.](https://github.com/php-soap/psr18-transport/#middleware)
-    - [Customize how ext-soap behaves](https://github.com/php-soap/ext-soap-engine/)
-    - [Select a WSDL Provider](https://github.com/php-soap/ext-soap-engine/#wsdlprovider)
+    - [Customize how the encoding behaves](https://github.com/php-soap/encoding)
+    - [Select a WSDL loader](https://github.com/php-soap/wsdl#wsdl-loader)
     - [Manipulate the metadata](docs/drivers/metadata.md)
 
 
@@ -87,10 +88,6 @@ For more advanced configuration, you can check the documentation inside the php-
 - [Configuration](docs/code-generation/configuration.md)
 - [Specify generation `Rules`](docs/code-generation/rules.md)
 - [Generate code through `Assemblers`](docs/code-generation/assemblers.md)
-
-## Known issues
-
-- [ext-soap](docs/known-issues/ext-soap.md)
 
 # Why this soap client was made
 
