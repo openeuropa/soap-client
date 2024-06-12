@@ -17,7 +17,7 @@
         "laminas/laminas-code": "^4.8.0",
         "php-soap/cached-engine": "~0.2",
         "php-soap/engine": "^2.10.1",
-        "php-soap/encoding": "~0.2",
+        "php-soap/encoding": "~0.4",
         "php-soap/psr18-transport": "^1.6",
         "php-soap/wsdl-reader": "~0.16",
         "psr/event-dispatcher": "^1.0",
