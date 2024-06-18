@@ -2,10 +2,11 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\PropertyContext;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\MethodGenerator;
 
@@ -49,27 +50,30 @@ class SetterAssembler implements AssemblerInterface
         $class = $context->getClass();
         $property = $context->getProperty();
         try {
-            $parameterOptions = ['name' => $property->getName()];
-            if ($this->options->useTypeHints()) {
-                $parameterOptions['type'] = $property->getPhpType();
-            }
             $methodName = Normalizer::generatePropertyMethod('set', $property->getName());
             $class->removeMethod($methodName);
 
+            $param = (new ParameterGenerator($property->getName()));
+            if ($this->options->useTypeHints()) {
+                $param->setType($property->getPhpType());
+            }
+
             $methodGenerator = new MethodGenerator($methodName);
             $methodGenerator->setReturnType('void');
-            $methodGenerator->setParameters([$parameterOptions]);
+            $methodGenerator->setParameter($param);
             $methodGenerator->setVisibility(MethodGenerator::VISIBILITY_PUBLIC);
             $methodGenerator->setBody(sprintf('$this->%1$s = $%1$s;', $property->getName()));
             if ($this->options->useDocBlocks()) {
-                $methodGenerator->setDocBlock(DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name' => 'param',
-                            'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
-                        ],
-                    ],
-                ]));
+                $methodGenerator->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name' => 'param',
+                                'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
+                            ]
+                        ])
+                );
             }
 
             $class->addMethodFromGenerator($methodGenerator);

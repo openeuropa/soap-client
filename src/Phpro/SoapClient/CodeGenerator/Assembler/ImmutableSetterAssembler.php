@@ -2,10 +2,11 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\PropertyContext;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\MethodGenerator;
 
@@ -62,30 +63,33 @@ class ImmutableSetterAssembler implements AssemblerInterface
                 '',
                 sprintf('return $new;'),
             ];
-            $parameterOptions = ['name' => $property->getName()];
+
+            $param = (new ParameterGenerator($property->getName()));
             if ($this->options->useTypeHints()) {
-                $parameterOptions['type'] = $property->getPhpType();
+                $param->setType($property->getPhpType());
             }
 
             $methodGenerator = new MethodGenerator($methodName);
-            $methodGenerator->setParameters([$parameterOptions]);
+            $methodGenerator->setParameter($param);
             $methodGenerator->setBody(implode($class::LINE_FEED, $lines));
             if ($this->options->useReturnTypes()) {
                 $methodGenerator->setReturnType('static');
             }
             if ($this->options->useDocBlocks()) {
-                $methodGenerator->setDocBlock(DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name' => 'param',
-                            'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
-                        ],
-                        [
-                            'name' => 'return',
-                            'description' => 'static',
-                        ],
-                    ],
-                ]));
+                $methodGenerator->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name' => 'param',
+                                'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
+                            ],
+                            [
+                                'name' => 'return',
+                                'description' => 'static',
+                            ],
+                        ])
+                );
             }
             $class->addMethodFromGenerator($methodGenerator);
         } catch (\Exception $e) {

@@ -2,6 +2,8 @@
 
 namespace Phpro\SoapClient\CodeGenerator;
 
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\Caller\EngineCaller;
 use Phpro\SoapClient\Caller\EventDispatchingCaller;
 use Phpro\SoapClient\CodeGenerator\Context\ClientFactoryContext;
@@ -64,24 +66,18 @@ BODY;
         $class->addUse(EngineCaller::class);
         $class->addUse(EncoderRegistry::class);
         $class->addMethodFromGenerator(
-            MethodGenerator::fromArray(
-                [
-                    'name' => 'factory',
-                    'static' => true,
-                    'body' => sprintf(self::BODY, $context->getClientName(), $context->getClassmapName()),
-                    'returntype' => $context->getClientFqcn(),
-                    'parameters' => [
-                        [
-                            'name' => 'wsdl',
-                            'type' => 'string',
-                        ],
-                    ],
-                    'docblock' => [
-                        'shortdescription' => 'This factory can be used as a starting point '.
-                            'to create your own specialized factory. Feel free to modify.',
-                    ],
-                ]
-            )
+            (new MethodGenerator('factory'))
+                ->setStatic(true)
+                ->setBody(sprintf(self::BODY, $context->getClientName(), $context->getClassmapName()))
+                ->setReturnType($context->getClientFqcn())
+                ->setParameter(new ParameterGenerator('wsdl', 'string'))
+                ->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setShortDescription(
+                            'This factory can be used as a starting point '.
+                            'to create your own specialized factory. Feel free to modify.'
+                        )
+                )
         );
 
         $file->setClass($class);

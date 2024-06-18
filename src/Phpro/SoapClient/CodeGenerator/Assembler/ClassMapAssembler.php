@@ -36,11 +36,7 @@ class ClassMapAssembler implements AssemblerInterface
      */
     public function assemble(ContextInterface $context)
     {
-        $class = ClassGenerator::fromArray(
-            [
-                'name' => $context->getName(),
-            ]
-        );
+        $class = new ClassGenerator($context->getName());
         $file = $context->getFile();
         $file->setClass($class);
         $file->setNamespace($context->getNamespace());
@@ -55,14 +51,10 @@ class ClassMapAssembler implements AssemblerInterface
             $classMap = $this->assembleClassMap($typeMap, $linefeed, $file->getIndentation());
             $code = $this->assembleClassMapCollection($classMap, $linefeed).$linefeed;
             $class->addMethodFromGenerator(
-                MethodGenerator::fromArray(
-                    [
-                        'name'       => 'getCollection',
-                        'static'     => true,
-                        'body'       => 'return '.$code,
-                        'returntype' => ClassMapCollection::class,
-                    ]
-                )
+                (new MethodGenerator('getCollection'))
+                    ->setStatic(true)
+                    ->setBody('return '.$code)
+                    ->setReturnType(ClassMapCollection::class)
             );
         } catch (\Exception $e) {
             throw AssemblerException::fromException($e);

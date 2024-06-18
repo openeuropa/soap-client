@@ -2,10 +2,10 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\TypeContext;
 use Phpro\SoapClient\CodeGenerator\Model\Property;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\CodeGenerator\TypeEnhancer\Calculator\ArrayBoundsCalculator;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\ClassGenerator;
@@ -67,45 +67,47 @@ class IteratorAssembler implements AssemblerInterface
         $methodName = 'getIterator';
         $class->removeMethod($methodName);
         $class->addMethodFromGenerator(
-            MethodGenerator::fromArray([
-                'name' => $methodName,
-                'parameters' => [],
-                'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                'body' => sprintf(
+            (new MethodGenerator($methodName))
+                ->setParameters([])
+                ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC)
+                ->setBody(sprintf(
                     'return new \\ArrayIterator($this->%1$s);',
                     $firstProperty->getName()
-                ),
-                'returntype' => 'ArrayIterator',
-                'docblock' => DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name' => 'return',
-                            'description' => '\\ArrayIterator|'. $firstProperty->getType() .'[]'
-                        ],
-                        [
-                            'name' => 'phpstan-return',
-                            'description' => '\\ArrayIterator'.$arrayInfo,
-                        ],
-                        [
-                            'name' => 'psalm-return',
-                            'description' => '\\ArrayIterator'.$arrayInfo,
-                        ]
-                    ]
-                ])
-            ])
+                ))
+                ->setReturnType('ArrayIterator')
+                ->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name' => 'return',
+                                'description' => '\\ArrayIterator|'. $firstProperty->getType() .'[]'
+                            ],
+                            [
+                                'name' => 'phpstan-return',
+                                'description' => '\\ArrayIterator'.$arrayInfo,
+                            ],
+                            [
+                                'name' => 'psalm-return',
+                                'description' => '\\ArrayIterator'.$arrayInfo,
+                            ]
+                        ])
+                )
         );
 
-        $class->setDocBlock(DocBlockGeneratorFactory::fromArray([
-            'tags' => [
-                [
-                    'name' => 'phpstan-implements',
-                    'description' => '\\IteratorAggregate'.$arrayInfo,
-                ],
-                [
-                    'name' => 'psalm-implements',
-                    'description' => '\\IteratorAggregate'.$arrayInfo,
-                ]
-            ]
-        ]));
+        $class->setDocBlock(
+            (new DocBlockGenerator())
+                ->setWordWrap(false)
+                ->setTags([
+                    [
+                        'name' => 'phpstan-implements',
+                        'description' => '\\IteratorAggregate'.$arrayInfo,
+                    ],
+                    [
+                        'name' => 'psalm-implements',
+                        'description' => '\\IteratorAggregate'.$arrayInfo,
+                    ]
+                ])
+        );
     }
 }

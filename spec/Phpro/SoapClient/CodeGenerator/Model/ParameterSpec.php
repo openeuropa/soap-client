@@ -35,16 +35,6 @@ class ParameterSpec extends ObjectBehavior
         $this->getNamespace()->shouldBe('MyParameterType');
     }
 
-    function it_returns_an_array()
-    {
-        $this->toArray()->shouldBe(
-            [
-                'name' => 'MyParameter',
-                'type' => '\\MyNamespace\\MyParameterType',
-            ]
-        );
-    }
-
     public function it_has_type_meta(): void
     {
         $this->getMeta()->shouldBeLike(new TypeMeta());

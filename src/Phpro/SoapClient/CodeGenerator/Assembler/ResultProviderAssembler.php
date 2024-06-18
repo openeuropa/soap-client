@@ -2,11 +2,11 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\TypeContext;
 use Phpro\SoapClient\CodeGenerator\Model\Property;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Phpro\SoapClient\Type\ResultInterface;
 use Phpro\SoapClient\Type\ResultProviderInterface;
@@ -87,21 +87,21 @@ class ResultProviderAssembler implements AssemblerInterface
         $methodName = 'getResult';
         $class->removeMethod($methodName);
         $class->addMethodFromGenerator(
-            MethodGenerator::fromArray([
-                'name' => $methodName,
-                'parameters' => [],
-                'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                'returntype' => ResultInterface::class,
-                'body' => $this->generateGetResultBody($property),
-                'docblock' => DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name' => 'return',
-                            'description' => $this->generateGetResultReturnTag($property)
-                        ]
-                    ]
-                ])
-            ])
+            (new MethodGenerator($methodName))
+                ->setParameters([])
+                ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC)
+                ->setReturnType(ResultInterface::class)
+                ->setBody($this->generateGetResultBody($property))
+                ->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name' => 'return',
+                                'description' => $this->generateGetResultReturnTag($property)
+                            ]
+                        ])
+                )
         );
     }
 

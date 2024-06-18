@@ -55,13 +55,11 @@ class JsonSerializableAssembler implements AssemblerInterface
         $methodName = 'jsonSerialize';
         $class->removeMethod($methodName);
         $class->addMethodFromGenerator(
-            MethodGenerator::fromArray([
-                'name' => $methodName,
-                'parameters' => [],
-                'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                'body' => $this->generateJsonSerializeBody($type, $class),
-                'returntype' => 'array',
-            ])
+            (new MethodGenerator($methodName))
+                ->setParameters([])
+                ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC)
+                ->setBody($this->generateJsonSerializeBody($type, $class))
+                ->setReturnType('array')
         );
     }
 

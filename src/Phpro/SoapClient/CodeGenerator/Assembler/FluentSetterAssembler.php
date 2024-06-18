@@ -2,11 +2,13 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\PropertyContext;
+use Phpro\SoapClient\CodeGenerator\Model\Parameter;
 use Phpro\SoapClient\CodeGenerator\Model\Property;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\MethodGenerator;
 
@@ -53,7 +55,7 @@ class FluentSetterAssembler implements AssemblerInterface
             $class->removeMethod($methodName);
 
             $methodGenerator = new MethodGenerator($methodName);
-            $methodGenerator->setParameters($this->getParameter($property));
+            $methodGenerator->setParameter($this->getParameter($property));
             $methodGenerator->setVisibility(MethodGenerator::VISIBILITY_PUBLIC);
             $methodGenerator->setBody(sprintf(
                 '$this->%1$s = $%1$s;%2$sreturn $this;',
@@ -64,18 +66,20 @@ class FluentSetterAssembler implements AssemblerInterface
                 $methodGenerator->setReturnType('static');
             }
             if ($this->options->useDocBlocks()) {
-                $methodGenerator->setDocBlock(DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name'        => 'param',
-                            'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
-                        ],
-                        [
-                            'name'        => 'return',
-                            'description' => '$this',
-                        ],
-                    ],
-                ]));
+                $methodGenerator->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name'        => 'param',
+                                'description' => sprintf('%s $%s', $property->getDocBlockType(), $property->getName()),
+                            ],
+                            [
+                                'name'        => 'return',
+                                'description' => '$this',
+                            ]
+                        ])
+                );
             }
             $class->addMethodFromGenerator($methodGenerator);
         } catch (\Exception $e) {
@@ -83,22 +87,13 @@ class FluentSetterAssembler implements AssemblerInterface
         }
     }
 
-    /**
-     * @param Property $property
-     *
-     * @return array
-     */
-    private function getParameter(Property $property): array
+    private function getParameter(Property $property): ParameterGenerator
     {
+        $param = (new ParameterGenerator($property->getName()));
         if ($this->options->useTypeHints()) {
-            return [
-                [
-                    'name' => $property->getName(),
-                    'type' => $property->getPhpType(),
-                ],
-            ];
+            $param->setType($property->getPhpType());
         }
 
-        return [$property->getName()];
+        return $param;
     }
 }
