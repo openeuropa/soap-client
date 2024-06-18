@@ -82,19 +82,6 @@ class Parameter
         return '\\'.$this->namespace.'\\'.Normalizer::normalizeClassname($this->type);
     }
 
-    /**
-     * Get an array representation for creating a Generator
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return [
-            'name' => $this->name,
-            'type' => $this->getType(),
-        ];
-    }
-
     public function getNamespace(): string
     {
         return $this->namespace;

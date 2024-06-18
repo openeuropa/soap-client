@@ -2,6 +2,7 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
 use Laminas\Code\Generator\TypeGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\PropertyContext;
@@ -55,24 +56,23 @@ class PropertyAssembler implements AssemblerInterface
                 $class->removeProperty($property->getName());
             }
 
-            $propertyGenerator = PropertyGenerator::fromArray([
-                'name' => $property->getName(),
-                'visibility' => $this->options->visibility(),
-                'omitdefaultvalue' => !$this->options->useOptionalValue()
-                    && !(new IsConsideredNullableType())($property->getMeta()),
-            ]);
+            $propertyGenerator = (new PropertyGenerator($property->getName()))
+                ->setVisibility($this->options->visibility())
+                ->omitDefaultValue(
+                    !$this->options->useOptionalValue() && !(new IsConsideredNullableType())($property->getMeta())
+                );
 
             if ($this->options->useDocBlocks()) {
                 $propertyGenerator->setDocBlock(
-                    DocBlockGeneratorFactory::fromArray([
-                        'longdescription' => $property->getMeta()->docs()->unwrapOr(''),
-                        'tags' => [
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setLongDescription($property->getMeta()->docs()->unwrapOr(''))
+                        ->setTags([
                             [
                                 'name'        => 'var',
                                 'description' => $property->getDocBlockType(),
                             ],
-                        ]
-                    ])
+                        ])
                 );
             }
 

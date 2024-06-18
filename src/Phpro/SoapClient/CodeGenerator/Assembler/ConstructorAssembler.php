@@ -2,10 +2,11 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
+use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\TypeContext;
 use Phpro\SoapClient\CodeGenerator\Model\Type;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\MethodGenerator;
 
@@ -67,21 +68,22 @@ class ConstructorAssembler implements AssemblerInterface
     private function assembleConstructor(Type $type): MethodGenerator
     {
         $body = [];
-        $constructor = MethodGenerator::fromArray([
-            'name' => '__construct',
-            'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-        ]);
-        $docblock = DocBlockGeneratorFactory::fromArray([
-            'shortdescription' => 'Constructor'
-        ]);
+        $constructor = (new MethodGenerator('__construct'))
+            ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC);
+
+        $docblock = (new DocBlockGenerator())
+            ->setWordWrap(false)
+            ->setShortDescription('Constructor');
 
         foreach ($type->getProperties() as $property) {
+            $param = (new ParameterGenerator($property->getName()));
             $body[] = sprintf('$this->%1$s = $%1$s;', $property->getName());
-            $withTypeHints = $this->options->useTypeHints() ? ['type' => $property->getPhpType()] : [];
 
-            $constructor->setParameter(array_merge([
-                'name' => $property->getName(),
-            ], $withTypeHints));
+            if ($this->options->useTypeHints()) {
+                $param->setType($property->getPhpType());
+            }
+
+            $constructor->setParameter($param);
 
             if ($this->options->useDocBlocks()) {
                 $docblock->setTag([

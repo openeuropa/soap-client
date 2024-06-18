@@ -2,11 +2,11 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
+use Laminas\Code\Generator\DocBlockGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\Context\PropertyContext;
 use Phpro\SoapClient\CodeGenerator\Model\Property;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\Exception\AssemblerException;
 use Laminas\Code\Generator\MethodGenerator;
 use Soap\Engine\Metadata\Model\TypeMeta;
@@ -70,14 +70,16 @@ class GetterAssembler implements AssemblerInterface
             }
 
             if ($this->options->useDocBlocks()) {
-                $methodGenerator->setDocBlock(DocBlockGeneratorFactory::fromArray([
-                    'tags' => [
-                        [
-                            'name'        => 'return',
-                            'description' => $property->getDocBlockType(),
-                        ],
-                    ],
-                ]));
+                $methodGenerator->setDocBlock(
+                    (new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
+                            [
+                                'name'        => 'return',
+                                'description' => $property->getDocBlockType(),
+                            ]
+                        ])
+                );
             }
 
             $class->addMethodFromGenerator($methodGenerator);

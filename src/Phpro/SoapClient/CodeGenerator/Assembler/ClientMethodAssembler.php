@@ -9,7 +9,6 @@ use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\CodeGenerator\Context\ClientMethodContext;
 use Phpro\SoapClient\CodeGenerator\Context\ContextInterface;
 use Phpro\SoapClient\CodeGenerator\GeneratorInterface;
-use Phpro\SoapClient\CodeGenerator\LaminasCodeFactory\DocBlockGeneratorFactory;
 use Phpro\SoapClient\CodeGenerator\Model\ClientMethod;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Phpro\SoapClient\Exception\AssemblerException;
@@ -55,16 +54,12 @@ class ClientMethodAssembler implements AssemblerInterface
             $methodBody = $this->generateMethodBody($class, $param, $method, $context);
 
             $class->addMethodFromGenerator(
-                MethodGenerator::fromArray(
-                    [
-                        'name' => $phpMethodName,
-                        'parameters' => $param === null ? [] : [$param],
-                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                        'body' => $methodBody,
-                        'returntype' => $this->decideOnReturnType($context, true),
-                        'docblock' => $docblock,
-                    ]
-                )
+                (new MethodGenerator($phpMethodName))
+                    ->setParameters($param === null ? [] : [$param])
+                    ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC)
+                    ->setBody($methodBody)
+                    ->setReturnType($this->decideOnReturnType($context, true))
+                    ->setDocBlock($docblock)
             );
         } catch (\Exception $e) {
             throw AssemblerException::fromException($e);
@@ -117,15 +112,10 @@ class ClientMethodAssembler implements AssemblerInterface
         if (!$method->shouldGenerateAsMultiArgumentsRequest()) {
             $param = current($context->getMethod()->getParameters());
 
-            return ParameterGenerator::fromArray($param->toArray());
+            return new ParameterGenerator($param->getName(), $param->getType());
         }
 
-        return ParameterGenerator::fromArray(
-            [
-                'name' => 'multiArgumentRequest',
-                'type' => MultiArgumentRequest::class,
-            ]
-        );
+        return new ParameterGenerator('multiArgumentRequest', MultiArgumentRequest::class);
     }
 
     /**
@@ -141,56 +131,22 @@ class ClientMethodAssembler implements AssemblerInterface
             $description[] = $parameter->getType().' $'.$parameter->getName();
         }
 
-        return DocBlockGeneratorFactory::fromArray(
-            [
-                'shortdescription' => $context->getMethod()->getMeta()->docs()->unwrapOr(''),
-                'longdescription' => implode(GeneratorInterface::EOL, $description),
-                'tags' => [
-                    [
-                        'name' => 'param',
-                        'description' => sprintf(
-                            '%s $%s',
-                            $this->generateClassNameAndAddImport(
-                                MultiArgumentRequest::class,
-                                $class
-                            ),
-                            'multiArgumentRequest'
-                        ),
-                    ],
-                    [
-                        'name' => 'return',
-                        'description' => sprintf(
-                            '%s & %s',
-                            $this->generateClassNameAndAddImport(ResultInterface::class, $class),
-                            $this->decideOnReturnType($context, false)
-                        ),
-                    ],
-                    [
-                        'name' => 'throws',
-                        'description' => $this->generateClassNameAndAddImport(
-                            SoapException::class,
+        return (new DocBlockGenerator())
+            ->setWordWrap(false)
+            ->setShortDescription($context->getMethod()->getMeta()->docs()->unwrapOr(''))
+            ->setLongDescription(implode(GeneratorInterface::EOL, $description))
+            ->setTags([
+                [
+                    'name' => 'param',
+                    'description' => sprintf(
+                        '%s $%s',
+                        $this->generateClassNameAndAddImport(
+                            MultiArgumentRequest::class,
                             $class
                         ),
-                    ],
+                        'multiArgumentRequest'
+                    ),
                 ],
-            ]
-        );
-    }
-
-    /**
-     * @param ClientMethodContext $context
-     *
-     * @return DocBlockGenerator
-     */
-    private function generateSingleArgumentDocblock(ClientMethodContext $context): DocBlockGenerator
-    {
-        $method = $context->getMethod();
-        $class = $context->getClass();
-        $param = current($method->getParameters());
-
-        $data = [
-            'shortdescription' => $context->getMethod()->getMeta()->docs()->unwrapOr(''),
-            'tags' => [
                 [
                     'name' => 'return',
                     'description' => sprintf(
@@ -206,12 +162,42 @@ class ClientMethodAssembler implements AssemblerInterface
                         $class
                     ),
                 ],
+            ]);
+    }
+
+    /**
+     * @param ClientMethodContext $context
+     *
+     * @return DocBlockGenerator
+     */
+    private function generateSingleArgumentDocblock(ClientMethodContext $context): DocBlockGenerator
+    {
+        $method = $context->getMethod();
+        $class = $context->getClass();
+        $param = current($method->getParameters());
+
+        $shortDescription = $context->getMethod()->getMeta()->docs()->unwrapOr('');
+        $tags = [
+            [
+                'name' => 'return',
+                'description' => sprintf(
+                    '%s & %s',
+                    $this->generateClassNameAndAddImport(ResultInterface::class, $class),
+                    $this->decideOnReturnType($context, false)
+                ),
+            ],
+            [
+                'name' => 'throws',
+                'description' => $this->generateClassNameAndAddImport(
+                    SoapException::class,
+                    $class
+                ),
             ],
         ];
 
         if ($param) {
             array_unshift(
-                $data['tags'],
+                $tags,
                 [
                     'name' => 'param',
                     'description' => sprintf(
@@ -224,8 +210,10 @@ class ClientMethodAssembler implements AssemblerInterface
             );
         }
 
-        return DocBlockGeneratorFactory::fromArray($data)
-            ->setWordWrap(false);
+        return (new DocBlockGenerator())
+            ->setWordWrap(false)
+            ->setShortDescription($shortDescription)
+            ->setTags($tags);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Phpro\SoapClient\CodeGenerator\Assembler;
 
 use Laminas\Code\Generator\ClassGenerator;
+use Laminas\Code\Generator\DocBlockGenerator;
 use Laminas\Code\Generator\MethodGenerator;
 use Laminas\Code\Generator\ParameterGenerator;
 use Laminas\Code\Generator\PropertyGenerator;
@@ -33,36 +34,23 @@ class ClientConstructorAssembler implements AssemblerInterface
         try {
             $caller = $this->generateClassNameAndAddImport(Caller::class, $class);
             $class->addPropertyFromGenerator(
-                PropertyGenerator::fromArray([
-                    'name' => 'caller',
-                    'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
-                    'omitdefaultvalue' => true,
-                    'docblock' => DocBlockGeneratorFactory::fromArray([
-                        'tags' => [
+                (new PropertyGenerator('caller'))
+                    ->setVisibility(PropertyGenerator::VISIBILITY_PRIVATE)
+                    ->omitDefaultValue(true)
+                    ->setDocBlock((new DocBlockGenerator())
+                        ->setWordWrap(false)
+                        ->setTags([
                             [
                                 'name'        => 'var',
                                 'description' => $caller,
                             ],
-                        ]
-                    ])
-                ])
+                        ])),
             );
             $class->addMethodFromGenerator(
-                MethodGenerator::fromArray(
-                    [
-                        'name' => '__construct',
-                        'parameters' => [
-                            ParameterGenerator::fromArray(
-                                [
-                                    'name' => 'caller',
-                                    'type' => Caller::class,
-                                ]
-                            )
-                        ],
-                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                        'body' => '$this->caller = $caller;',
-                    ]
-                )
+                (new MethodGenerator('__construct'))
+                    ->setParameter(new ParameterGenerator('caller', Caller::class))
+                    ->setVisibility(MethodGenerator::VISIBILITY_PUBLIC)
+                    ->setBody('$this->caller = $caller;')
             );
         } catch (\Exception $e) {
             throw AssemblerException::fromException($e);
