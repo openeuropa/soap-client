@@ -476,4 +476,55 @@ CODE;
 
         $this->assertEquals($expected, $code);
     }
+
+    /**
+     * @test
+     */
+    function it_can_deal_with_elements_referencing_complex_types_return_types()
+    {
+        $assembler = new ClientMethodAssembler();
+        $class = new ClassGenerator();
+        $class->setName('Vendor\\MyNamespace\\MyClient');
+        $typeNamespace = 'Vendor\\MyTypeNamespace';
+        $method = new ClientMethod(
+            'functionName',
+            [],
+            ReturnType::fromMetaData($typeNamespace, XsdType::create('ReturnTypeElement')->withXmlTypeName('ReturnType')),
+            $typeNamespace,
+            new MethodMeta()
+        );
+
+        $context = new ClientMethodContext($class, $method);
+        $assembler->assemble($context);
+
+        $code = $context->getClass()->generate();
+        $expected = <<<CODE
+namespace Vendor\MyNamespace;
+
+use Phpro\SoapClient\Type\ResultInterface;
+use Vendor\MyTypeNamespace;
+use Phpro\SoapClient\Exception\SoapException;
+use Phpro\SoapClient\Type\MultiArgumentRequest;
+
+class MyClient
+{
+    /**
+     * @return ResultInterface & MyTypeNamespace\ReturnType
+     * @throws SoapException
+     */
+    public function functionName() : \Vendor\MyTypeNamespace\ReturnType
+    {
+        \$response = (\$this->caller)('functionName', new MultiArgumentRequest([]));
+
+        \Psl\Type\instance_of(\Vendor\MyTypeNamespace\ReturnType::class)->assert(\$response);
+        \Psl\Type\instance_of(\Phpro\SoapClient\Type\ResultInterface::class)->assert(\$response);
+
+        return \$response;
+    }
+}
+
+CODE;
+
+        $this->assertEquals($expected, $code);
+    }
 }

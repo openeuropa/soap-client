@@ -92,7 +92,6 @@ CODE;
                 ],
                 (new XsdType('MyType'))
                     ->withXmlNamespace('http://my-namespace.com')
-                    ->withXmlTypeName('MyType'),
             ),
         ]);
 

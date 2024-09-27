@@ -80,7 +80,7 @@ class ClassMapAssembler implements AssemblerInterface
                 '%snew ClassMap(\'%s\', \'%s\', %s::class),',
                 $indentation,
                 $type->getXsdType()->getXmlNamespace(),
-                $type->getXsdType()->getXmlTypeName(),
+                $type->getXsdType()->getName(),
                 'Type\\'.$type->getName()
             );
         }

@@ -35,4 +35,18 @@ class ReturnTypeSpec extends ObjectBehavior
     {
         $this->getMeta()->shouldBeLike(new TypeMeta());
     }
+
+    public function it_falls_back_to_complex_type_if_its_an_element_referencing_this_type(): void
+    {
+        $this->beConstructedThrough(
+            'fromMetaData',
+            [
+                'My\Namespace',
+                XsdType::create('ElementType')
+                    ->withXmlTypeName('ComplexType')
+            ]
+        );
+
+        $this->getType()->shouldReturn('\\My\\Namespace\\ComplexType');
+    }
 }

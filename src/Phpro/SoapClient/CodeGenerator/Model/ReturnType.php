@@ -45,6 +45,9 @@ final class ReturnType
      */
     public static function fromMetaData(string $namespace, XsdType $returnType): self
     {
+        // Element types that are referencing complex types, should result in the complexType according to ext-soap:
+        $returnType = $returnType->copy($returnType->getXmlTypeName() ?: $returnType->getName());
+
         $typeName = (new TypeNameCalculator())($returnType);
 
         return new self(
