@@ -41,7 +41,7 @@ class ExtendingTypeAssemblerTest extends TestCase
     /**
      * @test
      */
-    function it_assembles_a_type()
+    function it_assembles_a_type_in_same_namespace()
     {
         $assembler = new ExtendingTypeAssembler();
         $context = $this->createContext();
@@ -51,7 +51,29 @@ class ExtendingTypeAssemblerTest extends TestCase
         $expected = <<<CODE
 namespace MyNamespace;
 
-use \MyNamespace\MyBaseType;
+class MyType extends MyBaseType
+{
+}
+
+CODE;
+
+        $this->assertEquals($expected, $code);
+    }
+
+    /**
+     * @test
+     */
+    function it_assembles_a_type_in_other_namespace()
+    {
+        $assembler = new ExtendingTypeAssembler();
+        $context = $this->createContext('OtherNamespace');
+        $assembler->assemble($context);
+
+        $code = $context->getClass()->generate();
+        $expected = <<<CODE
+namespace MyNamespace;
+
+use OtherNamespace\MyBaseType;
 
 class MyType extends MyBaseType
 {
@@ -119,10 +141,10 @@ CODE;
     /**
      * @return TypeContext
      */
-    private function createContext()
+    private function createContext(?string $importedNamespace = null)
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
+        $type = new Type($importedNamespace ?? 'MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
             'type' => 'MyBaseType',
             'namespace' => 'xxxx'
         ])));
