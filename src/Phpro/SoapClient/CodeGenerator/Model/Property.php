@@ -30,7 +30,7 @@ class Property
     private $type;
 
     /**
-     * @var non-empty-string
+     * @var string
      */
     private $namespace;
 
@@ -45,7 +45,7 @@ class Property
      *
      * @param non-empty-string $name
      * @param non-empty-string $type
-     * @param non-empty-string $namespace
+     * @param string $namespace
      */
     public function __construct(string $name, string $type, string $namespace, XsdType $xsdType)
     {
@@ -63,12 +63,21 @@ class Property
     public static function fromMetaData(string $namespace, MetadataProperty $property)
     {
         $type = $property->getType();
+        $typeName = $type->getName();
+
+        // This makes it possible to set FQCN as type names in the metadata through TypeReplacers.
+        if (Normalizer::isConsideredExistingThirdPartyClass($typeName)) {
+            $className = Normalizer::getClassNameFromFQN($typeName);
+            $type = $type->copy($className)->withBaseType($className);
+            $namespace = Normalizer::getNamespaceFromFQN($typeName);
+        }
+
         $meta = $type->getMeta();
-        $typeName = (new TypeNameCalculator())($type);
+        $calculatedTypeName = (new TypeNameCalculator())($type);
 
         return new self(
             non_empty_string()->assert($property->getName()),
-            non_empty_string()->assert($typeName),
+            non_empty_string()->assert($calculatedTypeName),
             $namespace,
             $type
         );
@@ -89,6 +98,10 @@ class Property
     {
         if (Normalizer::isKnownType($this->type)) {
             return $this->type;
+        }
+
+        if (!$this->namespace) {
+            return '\\'.Normalizer::normalizeClassname($this->type);
         }
 
         return '\\'.$this->namespace.'\\'.Normalizer::normalizeClassname($this->type);

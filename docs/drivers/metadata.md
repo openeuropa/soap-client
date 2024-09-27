@@ -49,7 +49,7 @@ return Config::create()
 
 ### Type replacements
 
-Depending on what XML encoders you configure, you might want to replace some types with other types.
+Depending on what [SOAP encoders](https://github.com/php-soap/encoding#encoder) you configure, you might want to replace some types with other types.
 Take following example:
 
 By default, a "date" type from the XSD namespace `http://www.w3.org/2001/XMLSchema` will be converted to a `DateTimeImmutable` object.
@@ -99,3 +99,32 @@ The TypeReplacers contain a default set of type replacements that are being used
 * `array` for SOAP 1.1 and 1.2 Arrays
 * `object` for SOAP 1.1 Objects
 * `array` for Apache Map types
+
+
+#### Using an existing 3rd party class
+
+If you want to replace a type with an existing 3rd party class, you can copy the type with the fully qualified class name of the 3rd party class.
+That way, the property type of the generated code will be set to the newly linked class.
+This type replacer is only being used for generating code.
+You will still need to implement the logic to convert the type to the 3rd party class in a [custom SOAP encoder](https://github.com/php-soap/encoding#encoder).
+
+```php
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\TypeReplacer;
+use Soap\Engine\Metadata\Model\XsdType;
+use Soap\WsdlReader\Metadata\Predicate\IsOfType;
+
+class GuidTypeReplacer implements TypeReplacer
+{
+    public function __invoke(XsdType $xsdType): XsdType
+    {
+        $check = new IsOfType('http://microsoft.com/wsdl/types/', 'guid');
+        if (!$check($xsdType)) {
+            return $xsdType;
+        }
+
+        return $xsdType->copy(\Ramsey\Uuid\UuidInterface::class);
+    }
+}
+```
+
+**Note**: If you want to use a built-in PHP class, you will need to prefix it with a backslash. For example: `\DateInterval`.

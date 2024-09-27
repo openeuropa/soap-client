@@ -252,6 +252,17 @@ class Normalizer
     }
 
     /**
+     * @param non-empty-string $name
+     */
+    public static function getNamespaceFromFQN($name): string
+    {
+        $arr = explode('\\', ltrim($name, '\\'));
+        array_pop($arr);
+
+        return implode('\\', $arr);
+    }
+
+    /**
      * @param non-empty-string      $useName
      * @param non-empty-string|null $useAlias
      *
@@ -265,5 +276,10 @@ class Normalizer
         }
 
         return $use;
+    }
+
+    public static function isConsideredExistingThirdPartyClass(string $class)
+    {
+        return str_contains($class, '\\') && class_exists($class);
     }
 }
