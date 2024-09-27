@@ -4,6 +4,7 @@ namespace spec\Phpro\SoapClient\CodeGenerator\Util;
 
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use PhpSpec\ObjectBehavior;
+use Psl\Option\Option;
 
 /**
  * Class NormalizerSpec
@@ -98,11 +99,27 @@ class NormalizerSpec extends ObjectBehavior
         $this->getClassNameFromFQN('Vendor\Namespace\MyClass')->shouldReturn('MyClass');
     }
 
+    function it_gets_namespace_from_fqn()
+    {
+        $this->getNamespaceFromFQN('\Namespace\MyClass')->shouldReturn('Namespace');
+        $this->getNamespaceFromFQN('Vendor\Namespace\MyClass')->shouldReturn('Vendor\Namespace');
+        $this->getNamespaceFromFQN('ExistingPHPClass')->shouldReturn('');
+    }
+
     function it_gets_complete_use_statement()
     {
         $this->getCompleteUseStatement('Namespace\MyClass',
             'ClassAlias')->shouldReturn('Namespace\MyClass as ClassAlias');
         $this->getCompleteUseStatement('Namespace\MyClass', null)->shouldReturn('Namespace\MyClass');
         $this->getCompleteUseStatement('MyClass', '')->shouldReturn('MyClass');
+    }
+
+    /** @test */
+    public function it_knows_about_third_party_classes(): void
+    {
+        $this->isConsideredExistingThirdPartyClass('DateTime')->shouldReturn(false);
+        $this->isConsideredExistingThirdPartyClass('\DateTime')->shouldReturn(true);
+        $this->isConsideredExistingThirdPartyClass(Option::class)->shouldReturn(true);
+        $this->isConsideredExistingThirdPartyClass('Unkown\Class')->shouldReturn(false);
     }
 }
