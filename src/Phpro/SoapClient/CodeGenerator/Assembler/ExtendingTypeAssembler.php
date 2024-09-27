@@ -39,7 +39,7 @@ class ExtendingTypeAssembler implements AssemblerInterface
 
         $namespace = $type->getNamespace();
         $typeName = Normalizer::normalizeClassname($extending['type']);
-        $extendedClassName = sprintf('\\%s\\%s', $namespace, $typeName);
+        $extendedClassName = sprintf('%s\\%s', $namespace, $typeName);
 
         try {
             $extendAssembler = new ExtendAssembler($extendedClassName);
