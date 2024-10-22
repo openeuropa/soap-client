@@ -25,6 +25,8 @@ class TypeMap
     private $namespace;
 
     /**
+     * @internal - Use TypeMap::fromMetadata instead
+     *
      * TypeMap constructor.
      *
      * @param non-empty-string $namespace

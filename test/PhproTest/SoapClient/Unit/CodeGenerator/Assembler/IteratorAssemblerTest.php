@@ -126,7 +126,7 @@ CODE;
     {
         $metaConfigurator ??= identity();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($namespace = 'MyNamespace', 'MyType', [
+        $type = new Type($namespace = 'MyNamespace', 'MyType', 'MyType', [
             Property::fromMetaData($namespace, new MetaProperty('prop1', XsdType::guess('string')->withMeta(
                 static fn (TypeMeta $meta): TypeMeta => $metaConfigurator($meta
                     ->withIsList(true)

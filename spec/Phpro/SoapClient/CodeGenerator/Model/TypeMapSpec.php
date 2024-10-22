@@ -21,7 +21,7 @@ class TypeMapSpec extends ObjectBehavior
     function let()
     {
         $this->beConstructedWith($namespace = 'MyNamespace', [
-            new Type($namespace, 'type1', [
+            new Type($namespace, 'type1', 'type1', [
                 new Property('prop1', 'string', $namespace, XsdType::create('string'))
             ], XsdType::create('MyType'))
         ]);

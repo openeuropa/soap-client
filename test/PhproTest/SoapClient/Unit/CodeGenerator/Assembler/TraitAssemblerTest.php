@@ -94,7 +94,7 @@ CODE;
     private function createContext()
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', [], XsdType::create('MyType'));
 
         return new TypeContext($class, $type);
     }

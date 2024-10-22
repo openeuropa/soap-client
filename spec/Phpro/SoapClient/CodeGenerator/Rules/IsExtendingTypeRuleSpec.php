@@ -61,28 +61,28 @@ class IsExtendingTypeRuleSpec extends ObjectBehavior
 
     function it_can_apply_to_type_context(RuleInterface $subRule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', 'MyExtending', [], XsdType::create('MyType')));
         $subRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_apply_to_property_context(RuleInterface $subRule, PropertyContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', 'MyExtending', [], XsdType::create('MyType')));
         $subRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_not_apply_on_invalid_type(RuleInterface $subRule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'NotExtending', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'NotExtending', 'NotExtending', [], XsdType::create('MyType')));
         $subRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(false);
     }
 
     function it_can_apply_if_subrule_does_not_apply(RuleInterface $subRule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'MyExtending', 'MyExtending', [], XsdType::create('MyType')));
         $subRule->appliesToContext($context)->willReturn(false);
         $this->appliesToContext($context)->shouldReturn(false);
     }

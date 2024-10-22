@@ -18,6 +18,8 @@ class ClientMethodMap
     private $methods;
 
     /**
+     * @internal - Use ClientMethodMap::fromMetadata instead
+     *
      * ClientMethodMap constructor.
      *
      * @param array|ClientMethod[] $methods

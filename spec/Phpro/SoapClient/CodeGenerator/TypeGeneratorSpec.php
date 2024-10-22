@@ -48,6 +48,7 @@ class TypeGeneratorSpec extends ObjectBehavior
         $type = new Type(
             $namespace = 'MyNamespace',
             'MyType',
+            'MyType',
             [new Property('prop1', 'string', $namespace, XsdType::create('string'))],
             XsdType::create('MyType')
         );
@@ -71,6 +72,7 @@ class TypeGeneratorSpec extends ObjectBehavior
     {
         $type = new Type(
             $namespace = 'MyNamespace',
+            'MyType',
             'MyType',
             [new Property('prop1', 'string', $namespace, XsdType::create('string'))],
             XsdType::create('MyType')

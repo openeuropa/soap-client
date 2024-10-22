@@ -48,7 +48,7 @@ class InterfaceAssemblerTest extends TestCase
     {
         $assembler = new InterfaceAssembler('MyUsedClass');
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', [], XsdType::create('MyType'));
         $property = Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string')));
         $context = new PropertyContext($class, $type, $property);
         $this->assertTrue($assembler->canAssemble($context));
@@ -84,7 +84,7 @@ CODE;
     private function createContext()
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($namespace = 'MyNamespace', 'MyType', [
+        $type = new Type($namespace = 'MyNamespace', 'MyType', 'MyType', [
             Property::fromMetaData($namespace, new MetaProperty('prop1', XsdType::guess('string'))),
             Property::fromMetaData($namespace, new MetaProperty('prop2', XsdType::guess('int'))),
         ], XsdType::create('MyType'));

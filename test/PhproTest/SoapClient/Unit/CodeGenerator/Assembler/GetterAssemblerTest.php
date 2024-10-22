@@ -257,7 +257,7 @@ CODE;
     {
         $assembler = new GetterAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($namespace = 'MyNamespace', 'MyType', [
+        $type = new Type($namespace = 'MyNamespace', 'MyType', 'MyType', [
             $property = Property::fromMetaData(
                 $namespace,
                 new MetaProperty('prop1', XsdType::guess('string')->withMeta(
@@ -298,12 +298,12 @@ CODE;
         $properties = [
             'prop1' => Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string'))),
             'prop2' => Property::fromMetaData('ns1', new MetaProperty('prop2', XsdType::guess('int'))),
-            'prop3' => Property::fromMetaData('ns1', new MetaProperty('prop3', XsdType::guess('boolean'))),
+            'prop3' => Property::fromMetaData('ns1', new MetaProperty('prop3', XsdType::guess('bool'))),
             'prop4' => Property::fromMetaData('ns1', new MetaProperty('prop4', XsdType::guess('My_Response'))),
         ];
 
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', array_values($properties), XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', array_values($properties), XsdType::create('MyType'));
         $property = $properties[$propertyName];
 
         return new PropertyContext($class, $type, $property);
@@ -321,7 +321,7 @@ CODE;
             ),
         ];
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', array_values($properties), XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', array_values($properties), XsdType::create('MyType'));
         $property = $properties['prop1'];
         return new PropertyContext($class, $type, $property);
     }

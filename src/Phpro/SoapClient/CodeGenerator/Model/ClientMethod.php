@@ -2,6 +2,7 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Model;
 
+use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Soap\Engine\Metadata\Model\Method as MetadataMethod;
 use Soap\Engine\Metadata\Model\MethodMeta;
 use Soap\Engine\Metadata\Model\Parameter as MetadataParameter;
@@ -35,6 +36,8 @@ class ClientMethod
     private MethodMeta $meta;
 
     /**
+     * @internal - Use ClientMethod::fromMetadata instead
+     *
      * TypeModel constructor.
      *
      * @param non-empty-string $name
@@ -71,7 +74,7 @@ class ClientMethod
                 iterator_to_array($method->getParameters())
             ),
             ReturnType::fromMetaData($parameterNamespace, $method->getReturnType()),
-            $parameterNamespace,
+            Normalizer::normalizeNamespace($parameterNamespace),
             $method->getMeta()
         );
     }

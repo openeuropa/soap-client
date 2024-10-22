@@ -27,6 +27,8 @@ final class ReturnType
     private TypeMeta $meta;
 
     /**
+     * @internal - Use ReturnType::fromMetaData instead
+     *
      * Property constructor.
      *
      * @param non-empty-string $type
@@ -34,8 +36,8 @@ final class ReturnType
      */
     public function __construct(string $type, string $namespace, XsdType $xsdType)
     {
-        $this->type = Normalizer::normalizeDataType($type);
-        $this->namespace = Normalizer::normalizeNamespace($namespace);
+        $this->type = $type;
+        $this->namespace = $namespace;
         $this->xsdType = $xsdType;
         $this->meta = $xsdType->getMeta();
     }
@@ -51,8 +53,8 @@ final class ReturnType
         $typeName = (new TypeNameCalculator())($returnType);
 
         return new self(
-            non_empty_string()->assert($typeName),
-            $namespace,
+            Normalizer::normalizeDataType(non_empty_string()->assert($typeName)),
+            Normalizer::normalizeNamespace($namespace),
             $returnType
         );
     }

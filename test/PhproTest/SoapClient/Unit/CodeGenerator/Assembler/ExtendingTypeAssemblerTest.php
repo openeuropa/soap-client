@@ -91,7 +91,7 @@ CODE;
     {
         $assembler = new ExtendingTypeAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', [], XsdType::create('MyType'));
 
         $context = new TypeContext($class, $type);
         $assembler->assemble($context);
@@ -116,7 +116,7 @@ CODE;
     {
         $assembler = new ExtendingTypeAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
+        $type = new Type('MyNamespace', 'MyType', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
             'type' => 'string',
             'namespace' => 'xsd',
             'isSimple' => true,
@@ -144,7 +144,7 @@ CODE;
     private function createContext(?string $importedNamespace = null)
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($importedNamespace ?? 'MyNamespace', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
+        $type = new Type($importedNamespace ?? 'MyNamespace', 'MyType', 'MyType', [], XsdType::create('MyType')->withMeta(static fn (TypeMeta $meta) => $meta->withExtends([
             'type' => 'MyBaseType',
             'namespace' => 'xxxx'
         ])));
