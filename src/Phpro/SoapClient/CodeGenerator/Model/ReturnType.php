@@ -66,6 +66,13 @@ final class ReturnType
         if (Normalizer::isKnownType($this->type)) {
             return $this->type;
         }
+        
+        if ($this->meta->isSimple()->unwrapOr(false)) {
+            return $this->meta->extends()
+                ->filter(static fn (array $extends): bool => $extends['isSimple'])
+                ->map(static fn (array $extends): string => $extends['type'])
+                ->unwrapOr('mixed');
+        }
 
         return '\\'.$this->namespace.'\\'.Normalizer::normalizeClassname($this->type);
     }
