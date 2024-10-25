@@ -26,7 +26,7 @@ class ConstructorAssembler implements AssemblerInterface
      *
      * @param ConstructorAssemblerOptions|null $options
      */
-    public function __construct(ConstructorAssemblerOptions $options = null)
+    public function __construct(?ConstructorAssemblerOptions $options = null)
     {
         $this->options = $options ?? new ConstructorAssemblerOptions();
     }
