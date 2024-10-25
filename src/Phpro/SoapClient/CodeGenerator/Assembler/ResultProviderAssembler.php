@@ -30,7 +30,7 @@ class ResultProviderAssembler implements AssemblerInterface
      *
      * @param non-empty-string $wrapperClass
      */
-    public function __construct(string $wrapperClass = null)
+    public function __construct(?string $wrapperClass = null)
     {
         $wrapperClass = ($wrapperClass !== null) ? ltrim($wrapperClass, '\\') : null;
 
