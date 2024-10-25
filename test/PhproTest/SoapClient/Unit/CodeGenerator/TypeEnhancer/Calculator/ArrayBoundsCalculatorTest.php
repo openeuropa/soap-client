@@ -23,7 +23,7 @@ class ArrayBoundsCalculatorTest extends TestCase
         self::assertSame($expected, $calculator($meta));
     }
 
-    public function provideExpectations()
+    public static function provideExpectations()
     {
         yield 'simpleType' => [
             new TypeMeta(),

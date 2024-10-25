@@ -1,4 +1,10 @@
-<phpunit bootstrap="./test/bootstrap.php" colors="true">
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    displayDetailsOnPhpunitDeprecations="true"
+    bootstrap="./test/bootstrap.php"
+    colors="true"
+>
     <testsuites>
         <testsuite name="Unit">
             <directory>./test/PhproTest/SoapClient/Unit</directory>

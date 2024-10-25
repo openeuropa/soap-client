@@ -21,7 +21,7 @@ class TypeNameCalculatorTest extends TestCase
 
     }
 
-    public function provideTypeNameCalculations()
+    public static function provideTypeNameCalculations()
     {
         yield 'complexType' => [
             XsdType::create('ComplexType')->withMeta(

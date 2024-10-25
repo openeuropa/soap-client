@@ -31,7 +31,7 @@ class EnumValuesCalculatorTest extends TestCase
         (new EnumValuesCalculator())(new TypeMeta());
     }
 
-    public function provideExpectations()
+    public static function provideExpectations()
     {
         yield 'empty' => [
             (new TypeMeta())->withEnums(['']),

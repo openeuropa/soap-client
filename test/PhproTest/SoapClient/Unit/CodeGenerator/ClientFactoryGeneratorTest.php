@@ -33,6 +33,8 @@ class MyclientFactory
     /**
      * This factory can be used as a starting point to create your own specialized
      * factory. Feel free to modify.
+     *
+     * @param non-empty-string \$wsdl
      */
     public static function factory(string \$wsdl) : \App\Client\Myclient
     {
