@@ -31,7 +31,7 @@ class UseAssembler implements AssemblerInterface
      * @param non-empty-string $useName
      * @param non-empty-string|null $useAlias
      */
-    public function __construct(string $useName, string $useAlias = null)
+    public function __construct(string $useName, ?string $useAlias = null)
     {
         $this->useName = $useName;
         $this->useAlias = $useAlias;
