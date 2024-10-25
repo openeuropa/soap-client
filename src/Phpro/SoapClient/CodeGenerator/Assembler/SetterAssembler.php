@@ -27,7 +27,7 @@ class SetterAssembler implements AssemblerInterface
      *
      * @param SetterAssemblerOptions|null $options
      */
-    public function __construct(SetterAssemblerOptions $options = null)
+    public function __construct(?SetterAssemblerOptions $options = null)
     {
         $this->options = $options ?? new SetterAssemblerOptions();
     }

@@ -268,7 +268,7 @@ class Normalizer
      *
      * @return non-empty-string
      */
-    public static function getCompleteUseStatement(string $useName, string $useAlias = null): string
+    public static function getCompleteUseStatement(string $useName, ?string $useAlias = null): string
     {
         $use = $useName;
         if (null !== $useAlias && $useAlias !== '') {
