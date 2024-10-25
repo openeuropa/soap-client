@@ -77,6 +77,12 @@ BODY;
                             'This factory can be used as a starting point '.
                             'to create your own specialized factory. Feel free to modify.'
                         )
+                        ->setTags([
+                            [
+                                'name' => 'param',
+                                'description' => 'non-empty-string $wsdl',
+                            ],
+                        ])
                 )
         );
 

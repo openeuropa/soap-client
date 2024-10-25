@@ -31,7 +31,7 @@ class UnionTypesCalculatorTest extends TestCase
         (new UnionTypesCalculator())(new TypeMeta());
     }
 
-    public function provideExpectations()
+    public static function provideExpectations()
     {
         yield 'single' => [
             (new TypeMeta())->withUnions([

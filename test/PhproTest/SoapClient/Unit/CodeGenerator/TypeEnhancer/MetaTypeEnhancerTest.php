@@ -25,7 +25,7 @@ class MetaTypeEnhancerTest extends TestCase
         self::assertSame($expectedPhp, $enhancer->asPhpType($type));
     }
 
-    public function provideExpectations()
+    public static function provideExpectations()
     {
         yield 'simpleType' => [
             new TypeMeta(),
