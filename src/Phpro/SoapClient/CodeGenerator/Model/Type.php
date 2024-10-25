@@ -42,17 +42,20 @@ class Type
     private TypeMeta $meta;
 
     /**
+     * @internal - Use Type::fromMetadata instead
+     *
      * TypeModel constructor.
      *
      * @param non-empty-string     $namespace
      * @param non-empty-string     $xsdName
+     * @param non-empty-string     $name
      * @param Property[] $properties
      */
-    public function __construct(string $namespace, string $xsdName, array $properties, XsdType $xsdType)
+    public function __construct(string $namespace, string $xsdName, string $name, array $properties, XsdType $xsdType)
     {
-        $this->namespace = Normalizer::normalizeNamespace($namespace);
+        $this->namespace = $namespace;
         $this->xsdName = $xsdName;
-        $this->name = Normalizer::normalizeClassname($xsdName);
+        $this->name = $name;
         $this->properties = $properties;
         $this->xsdType = $xsdType;
         $this->meta = $xsdType->getMeta();
@@ -63,9 +66,12 @@ class Type
      */
     public static function fromMetadata(string $namespace, MetadataType $type): self
     {
+        $xsdName = non_empty_string()->assert($type->getName());
+
         return new self(
-            $namespace,
-            non_empty_string()->assert($type->getName()),
+            Normalizer::normalizeNamespace($namespace),
+            $xsdName,
+            Normalizer::normalizeClassname($xsdName),
             array_map(
                 function (MetadataProperty $property) use ($namespace) {
                     return Property::fromMetaData(

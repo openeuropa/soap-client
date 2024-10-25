@@ -246,7 +246,7 @@ CODE;
     {
         $assembler = new ImmutableSetterAssembler();
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($namespace = 'MyNamespace', 'MyType', [
+        $type = new Type($namespace = 'MyNamespace', 'MyType', 'MyType', [
             $property = Property::fromMetaData(
                 $namespace,
                 new MetaProperty('prop1', XsdType::guess('string')->withMeta(
@@ -288,7 +288,7 @@ CODE;
     private function createContext()
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', [
+        $type = new Type('MyNamespace', 'MyType', 'MyType', [
             $property = Property::fromMetaData('ns1', new MetaProperty('prop1', XsdType::guess('string'))),
         ], XsdType::create('MyType'));
 
@@ -307,7 +307,7 @@ CODE;
             ),
         ];
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type('MyNamespace', 'MyType', array_values($properties), XsdType::create('MyType'));
+        $type = new Type('MyNamespace', 'MyType', 'MyType', array_values($properties), XsdType::create('MyType'));
         $property = $properties['prop1'];
         return new PropertyContext($class, $type, $property);
     }

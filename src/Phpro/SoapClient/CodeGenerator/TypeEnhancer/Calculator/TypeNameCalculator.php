@@ -28,11 +28,11 @@ final class TypeNameCalculator
         $isList = $meta->isList()->unwrapOr(false);
         if ($isList) {
             $memberType = $type->getMemberTypes()[0] ?? 'mixed';
-            return $isKnownType ? $type->getName() : $memberType;
+            return $isKnownType ? $normalizedTypeName : $memberType;
         }
 
         if ($isKnownType) {
-            return $type->getName();
+            return $normalizedTypeName;
         }
 
         return $type->getBaseTypeOrFallbackToName();

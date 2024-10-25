@@ -84,6 +84,7 @@ CODE;
             new Type(
                 $namespace,
                 'MyType',
+                'MyType',
                 [
                     Property::fromMetaData(
                         $namespace,

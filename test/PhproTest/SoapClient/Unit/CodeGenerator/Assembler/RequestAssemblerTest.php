@@ -70,7 +70,7 @@ CODE;
     private function createContext()
     {
         $class = new ClassGenerator('MyType', 'MyNamespace');
-        $type = new Type($namespace = 'MyNamespace', 'MyType', [
+        $type = new Type($namespace = 'MyNamespace', 'MyType', 'MyType', [
             Property::fromMetaData($namespace, new MetaProperty('prop1', XsdType::guess('string'))),
             Property::fromMetaData($namespace, new MetaProperty('prop2', XsdType::guess('int'))),
         ], XsdType::create('MyType'));

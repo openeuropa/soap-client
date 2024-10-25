@@ -278,7 +278,10 @@ class Normalizer
         return $use;
     }
 
-    public static function isConsideredExistingThirdPartyClass(string $class)
+    /**
+     * @phpstan-assert-if-true non-empty-string $class
+     */
+    public static function isConsideredExistingThirdPartyClass(string $class): bool
     {
         return str_contains($class, '\\') && class_exists($class);
     }

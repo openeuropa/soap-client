@@ -6,7 +6,6 @@ use Phpro\SoapClient\CodeGenerator\TypeEnhancer\Calculator\TypeNameCalculator;
 use Phpro\SoapClient\CodeGenerator\TypeEnhancer\MetaTypeEnhancer;
 use Phpro\SoapClient\CodeGenerator\TypeEnhancer\TypeEnhancer;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
-use Soap\Engine\Metadata\Metadata;
 use Soap\Engine\Metadata\Model\Property as MetadataProperty;
 use Soap\Engine\Metadata\Model\TypeMeta;
 use Soap\Engine\Metadata\Model\XsdType;
@@ -41,6 +40,8 @@ class Property
     private TypeEnhancer $typeEnhancer;
 
     /**
+     * @internal
+     *
      * Property constructor.
      *
      * @param non-empty-string $name
@@ -49,9 +50,9 @@ class Property
      */
     public function __construct(string $name, string $type, string $namespace, XsdType $xsdType)
     {
-        $this->name = Normalizer::normalizeProperty($name);
-        $this->type = Normalizer::normalizeDataType($type);
-        $this->namespace = Normalizer::normalizeNamespace($namespace);
+        $this->name = $name;
+        $this->type = $type;
+        $this->namespace = $namespace;
         $this->xsdType = $xsdType;
         $this->meta = $xsdType->getMeta();
         $this->typeEnhancer = new MetaTypeEnhancer($this->meta);
@@ -60,25 +61,24 @@ class Property
     /**
      * @param non-empty-string $namespace
      */
-    public static function fromMetaData(string $namespace, MetadataProperty $property)
+    public static function fromMetaData(string $namespace, MetadataProperty $property): self
     {
         $type = $property->getType();
         $typeName = $type->getName();
+        $calculatedTypeName = Normalizer::normalizeDataType((new TypeNameCalculator())($type));
 
         // This makes it possible to set FQCN as type names in the metadata through TypeReplacers.
         if (Normalizer::isConsideredExistingThirdPartyClass($typeName)) {
             $className = Normalizer::getClassNameFromFQN($typeName);
-            $type = $type->copy($className)->withBaseType($className);
+            $type = $type->copy($className)->withBaseType($className)->withMemberTypes([]);
             $namespace = Normalizer::getNamespaceFromFQN($typeName);
+            $calculatedTypeName = $className;
         }
 
-        $meta = $type->getMeta();
-        $calculatedTypeName = (new TypeNameCalculator())($type);
-
         return new self(
-            non_empty_string()->assert($property->getName()),
+            Normalizer::normalizeProperty(non_empty_string()->assert($property->getName())),
             non_empty_string()->assert($calculatedTypeName),
-            $namespace,
+            Normalizer::normalizeNamespace($namespace),
             $type
         );
     }

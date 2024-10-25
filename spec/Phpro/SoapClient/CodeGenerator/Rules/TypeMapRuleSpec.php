@@ -48,48 +48,48 @@ class TypeMapRuleSpec extends ObjectBehavior
 
     function it_can_apply_to_type_context(RuleInterface $rule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', 'SomeType', [], XsdType::create('MyType')));
         $rule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_apply_to_property_context(RuleInterface $rule, PropertyContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', 'SomeType', [], XsdType::create('MyType')));
         $rule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_apply_the_default_assembler_to_unknown_types(RuleInterface $defaultRule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'UnknownType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'UnknownType', 'UnknownType', [], XsdType::create('MyType')));
         $defaultRule->appliesToContext($context)->willReturn(true);
         $this->appliesToContext($context)->shouldReturn(true);
     }
 
     function it_can_not_apply_to_knwon_types_with_no_rule(TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'NullType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'NullType', 'NullType', [], XsdType::create('MyType')));
         $this->appliesToContext($context)->shouldReturn(false);
     }
 
     function it_can_not_apply_if_rule_does_not_apply(RuleInterface $rule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', 'SomeType', [], XsdType::create('MyType')));
         $rule->appliesToContext($context)->willReturn(false);
         $this->appliesToContext($context)->shouldReturn(false);
     }
 
     function it_applies_a_specified_rule_to_known_types(RuleInterface $rule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'SomeType', 'SomeType', [], XsdType::create('MyType')));
         $rule->apply($context)->shouldBeCalled();
         $this->apply($context);
     }
 
     function it_applies_the_default_rule_to_unknown_types(RuleInterface $defaultRule, TypeContext $context)
     {
-        $context->getType()->willReturn(new Type('MyNamespace', 'UnknownType', [], XsdType::create('MyType')));
+        $context->getType()->willReturn(new Type('MyNamespace', 'UnknownType', 'UnknownType', [], XsdType::create('MyType')));
         $defaultRule->apply($context)->shouldBeCalled();
         $this->apply($context);
     }

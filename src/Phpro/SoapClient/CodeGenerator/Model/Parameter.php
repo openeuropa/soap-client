@@ -31,6 +31,8 @@ class Parameter
     private TypeMeta $meta;
 
     /**
+     * @internal - Use Parameter::fromMetadata instead
+     *
      * Parameter constructor.
      *
      * @param non-empty-string $name
@@ -39,9 +41,9 @@ class Parameter
      */
     public function __construct(string $name, string $type, string $namespace, XsdType $xsdType)
     {
-        $this->name = Normalizer::normalizeProperty($name);
-        $this->type = Normalizer::normalizeDataType($type);
-        $this->namespace = Normalizer::normalizeNamespace($namespace);
+        $this->name = $name;
+        $this->type = $type;
+        $this->namespace = $namespace;
         $this->xsdType = $xsdType;
         $this->meta = $xsdType->getMeta();
     }
@@ -55,9 +57,9 @@ class Parameter
         $typeName = (new TypeNameCalculator())($type);
 
         return new self(
-            non_empty_string()->assert($parameter->getName()),
-            non_empty_string()->assert($typeName),
-            $parameterNamespace,
+            Normalizer::normalizeProperty(non_empty_string()->assert($parameter->getName())),
+            Normalizer::normalizeDataType(non_empty_string()->assert($typeName)),
+            Normalizer::normalizeNamespace($parameterNamespace),
             $type
         );
     }
