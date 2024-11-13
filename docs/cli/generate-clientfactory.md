@@ -46,6 +46,7 @@ use Soap\Encoding\EncoderRegistry;
 use Soap\Psr18Transport\Psr18Transport;
 use Soap\Psr18Transport\Wsdl\Psr18Loader;
 use Soap\Wsdl\Loader\FlatteningLoader;
+use Soap\WsdlReader\Locator\ServiceSelectionCriteria
 use Soap\WsdlReader\Model\Definitions\SoapVersion;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -77,7 +78,12 @@ class CalculatorClientFactory
                     new RedisAdapter(RedisAdapter::createConnection('redis://localhost')),
                     new CacheConfig('my-wsdl-cache-key', ttlInSeconds: 3600)
                 )
-                ->withPreferredSoapVersion(SoapVersion::SOAP_12)
+                ->withWsdlServiceSelectionCriteria(
+                    ServiceSelectionCriteria::defaults()
+                        ->withPreferredSoapVersion(SoapVersion::SOAP_12)
+                        ->withServiceName('SpecificServiceName')
+                        ->withPortName('SpecificPortName')
+                )
         );
 
         $eventDispatcher = new EventDispatcher();
