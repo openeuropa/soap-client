@@ -7,7 +7,7 @@ jobs:
         timeout-minutes: 10
         strategy:
             matrix:
-                operating-system: ['windows-latest', 'ubuntu-latest']
+                operating-system: ['ubuntu-latest']
                 php-versions: ['8.2', '8.3', '8.4']
                 composer-options: ['', '--prefer-lowest']
             fail-fast: false

@@ -12,7 +12,7 @@ use function Psl\Type\non_empty_string;
 class Normalizer
 {
     private static $normalizations = [
-        'any' => 'mixed',
+        'any' => 'string',
         'anytype' => 'mixed',
         'anyxml' => 'string',
         'anysimpletype' => 'mixed',
