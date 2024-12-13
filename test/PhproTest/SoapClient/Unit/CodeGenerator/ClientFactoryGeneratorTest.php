@@ -52,7 +52,7 @@ class MyclientFactory
                 // ->withTransport()
                 // If you want specific SOAP setting:
                 // ->withWsdlParserContext()
-                // ->withPreferredSoapVersion()
+                // ->withWsdlServiceSelectionCriteria()
         );
 
         \$eventDispatcher = new EventDispatcher();

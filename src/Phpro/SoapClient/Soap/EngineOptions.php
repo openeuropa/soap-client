@@ -27,9 +27,10 @@ final class EngineOptions
     private ?Transport $transport = null;
     private ?CacheItemPoolInterface $cache = null;
     private ?CacheConfig $cacheConfig = null;
-    private ?SoapVersion $preferredSoapVersion = null;
     private ?ParserContext $wsdlParserContext = null;
     private ?EncoderRegistry $encoderRegistry = null;
+
+    private ?ServiceSelectionCriteria $wsdlServiceSelectionCriteria = null;
 
     /**
      * @param non-empty-string $wsdl
@@ -81,18 +82,18 @@ final class EngineOptions
         return $clone;
     }
 
-    public function withPreferredSoapVersion(SoapVersion $preferredSoapVersion): self
-    {
-        $clone = clone $this;
-        $clone->preferredSoapVersion = $preferredSoapVersion;
-
-        return $clone;
-    }
-
     public function withEncoderRegistry(EncoderRegistry $registry): self
     {
         $clone = clone $this;
         $clone->encoderRegistry = $registry;
+
+        return $clone;
+    }
+
+    public function withWsdlServiceSelectionCriteria(ServiceSelectionCriteria $criteria): self
+    {
+        $clone = clone $this;
+        $clone->wsdlServiceSelectionCriteria = $criteria;
 
         return $clone;
     }
@@ -133,19 +134,11 @@ final class EngineOptions
         return $this->cacheConfig ?? new CacheConfig('soap-engine-'.md5($this->wsdl));
     }
 
-    /**
-     * @return Option<SoapVersion>
-     */
-    public function getPreferredSoapVersion(): Option
-    {
-        return from_nullable($this->preferredSoapVersion);
-    }
-
     public function getWsdlServiceSelectionCriteria(): ServiceSelectionCriteria
     {
-        return ServiceSelectionCriteria::defaults()
-            ->withAllowHttpPorts(false)
-            ->withPreferredSoapVersion($this->preferredSoapVersion);
+        return ($this->wsdlServiceSelectionCriteria ?? ServiceSelectionCriteria::defaults())
+            // HTTP ports are not supported in this SOAP-client
+            ->withAllowHttpPorts(false);
     }
 
     public function getEncoderRegistry(): EncoderRegistry
