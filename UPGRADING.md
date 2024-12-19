@@ -65,7 +65,7 @@ $engine = DefaultEngineFactory::create(
         // ->withTransport()
         // If you want specific SOAP setting:
         // ->withWsdlParserContext()
-        // ->withPreferredSoapVersion()
+        // ->withWsdlServiceSelectionCriteria()
 );
 ```
 
