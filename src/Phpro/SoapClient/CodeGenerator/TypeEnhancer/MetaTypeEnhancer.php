@@ -22,9 +22,13 @@ final class MetaTypeEnhancer implements TypeEnhancer
      */
     public function asDocBlockType(string $type): string
     {
+        $isLocal = $this->meta->isLocal()->unwrapOr(false);
+        $isEnum = (bool) $this->meta->enums()->unwrapOr([]);
+        $isUnion = (bool) $this->meta->unions()->unwrapOr([]);
+
         $type = match (true) {
-            (bool) $this->meta->enums()->unwrapOr([]) => (new EnumValuesCalculator())($this->meta),
-            (bool) $this->meta->unions()->unwrapOr([]) => (new UnionTypesCalculator())($this->meta),
+            $isLocal && $isEnum => (new EnumValuesCalculator())($this->meta),
+            $isUnion => (new UnionTypesCalculator())($this->meta),
             default => $type
         };
 

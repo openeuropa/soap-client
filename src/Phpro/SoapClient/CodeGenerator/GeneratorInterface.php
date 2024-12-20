@@ -8,6 +8,8 @@ use Laminas\Code\Generator\FileGenerator;
  * Interface GeneratorInterface
  *
  * @package Phpro\SoapClient\CodeGenerator
+ *
+ * @template Context
  */
 interface GeneratorInterface
 {
@@ -16,9 +18,9 @@ interface GeneratorInterface
     
     /**
      * @param FileGenerator $file
-     * @param mixed         $model
+     * @param Context       $context
      *
      * @return string
      */
-    public function generate(FileGenerator $file, $model): string;
+    public function generate(FileGenerator $file, $context): string;
 }

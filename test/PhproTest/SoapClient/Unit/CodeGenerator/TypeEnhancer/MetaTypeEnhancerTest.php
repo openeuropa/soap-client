@@ -63,26 +63,32 @@ class MetaTypeEnhancerTest extends TestCase
             'null | array<int<0,max>, simple>',
             '?array',
         ];
-        yield 'enum' => [
-            (new TypeMeta())->withEnums(['a', 'b']),
+        yield 'global-enum' => [
+            (new TypeMeta())->withEnums(['a', 'b'])->withIsLocal(false),
+            'string',
+            "string",
+            'string',
+        ];
+        yield 'local-enum' => [
+            (new TypeMeta())->withEnums(['a', 'b'])->withIsLocal(true),
             'string',
             "'a' | 'b'",
             'string',
         ];
-        yield 'enum-list' => [
-            (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true),
+        yield 'local-enum-list' => [
+            (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true)->withIsLocal(true),
             'string',
             "array<int<0,max>, 'a' | 'b'>",
             'array',
         ];
-        yield 'nullable-enum-list' => [
-            (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true)->withIsNullable(true),
+        yield 'local-nullable-enum-list' => [
+            (new TypeMeta())->withEnums(['a', 'b'])->withIsList(true)->withIsNullable(true)->withIsLocal(true),
             'string',
             "null | array<int<0,max>, 'a' | 'b'>",
             '?array',
         ];
-        yield 'nullable-enum' => [
-            (new TypeMeta())->withEnums(['a', 'b'])->withIsNullable(true),
+        yield 'local-nullable-enum' => [
+            (new TypeMeta())->withEnums(['a', 'b'])->withIsNullable(true)->withIsLocal(true),
             'string',
             "null | 'a' | 'b'",
             '?string',

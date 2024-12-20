@@ -60,6 +60,25 @@ class NormalizerSpec extends ObjectBehavior
         $this->normalizeProperty('My-./final*prop_123')->shouldReturn('MyFinalProp_123');
     }
 
+    function it_normalizes_enum_cases()
+    {
+        $this->normalizeEnumCaseName('')->shouldReturn('Empty');
+
+        $this->normalizeEnumCaseName('-1')->shouldReturn('Value_Minus_1');
+        $this->normalizeEnumCaseName('0')->shouldReturn('Value_0');
+        $this->normalizeEnumCaseName('1')->shouldReturn('Value_1');
+        $this->normalizeEnumCaseName('10000')->shouldReturn('Value_10000');
+
+        $this->normalizeEnumCaseName('final')->shouldReturn('final');
+        $this->normalizeEnumCaseName('Final')->shouldReturn('Final');
+        $this->normalizeEnumCaseName('UpperCased')->shouldReturn('UpperCased');
+        $this->normalizeEnumCaseName('my-./*prop_123')->shouldReturn('myProp_123');
+        $this->normalizeEnumCaseName('My-./*prop_123')->shouldReturn('MyProp_123');
+        $this->normalizeEnumCaseName('My-./final*prop_123')->shouldReturn('MyFinalProp_123');
+
+        $this->normalizeEnumCaseName('1 specific option')->shouldReturn('Value_1SpecificOption');
+    }
+
     function it_normalizes_datatypes()
     {
         $this->normalizeDataType('string')->shouldReturn('string');

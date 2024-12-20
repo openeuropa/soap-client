@@ -41,9 +41,9 @@ class MyclientFactory
         \$engine = DefaultEngineFactory::create(
             EngineOptions::defaults(\$wsdl)
                 ->withEncoderRegistry(
-                    EncoderRegistry::default()->addClassMapCollection(
-                        SomeClassmap::getCollection()
-                    )
+                    EncoderRegistry::default()
+                        ->addClassMapCollection(SomeClassmap::types())
+                        ->addBackedEnumClassMapCollection(SomeClassmap::enums())
                 )
                 // If you want to enable WSDL caching:
                 // ->withCache() 

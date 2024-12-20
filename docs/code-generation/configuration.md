@@ -6,20 +6,21 @@ The code generation commands require a configuration file to determine how the S
 <?php
 // my-soap-config.php
 
-use Phpro\SoapClient\CodeGenerator\Config\Config;
-use Phpro\SoapClient\CodeGenerator\Rules;
 use Phpro\SoapClient\CodeGenerator\Assembler;
-use Phpro\SoapClient\Soap\DefaultEngineFactory;
+use Phpro\SoapClient\CodeGenerator\Rules;
+use Phpro\SoapClient\CodeGenerator\Config\Config;
 use Phpro\SoapClient\Soap\EngineOptions;
-use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
-use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
-use Soap\Wsdl\Loader\FlatteningLoader;
-use Soap\Wsdl\Loader\StreamWrapperLoader;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
 
 return Config::create()
     ->setEngine(DefaultEngineFactory::create(
-        EngineOptions::defaults('wsdl.xml')
+        EngineOptions::defaults($wsdl)
             ->withWsdlLoader(new FlatteningLoader(new StreamWrapperLoader()))
+            ->withEncoderRegistry(
+                EncoderRegistry::default()
+                    ->addClassMapCollection(SomeClassmap::types())
+                    ->addBackedEnumClassMapCollection(SomeClassmap::enums())
+            )
     ))
     ->setTypeDestination('src/SoapTypes')
     ->setTypeNamespace('SoapTypes')
@@ -29,23 +30,39 @@ return Config::create()
     ->setClassMapNamespace('Acme\\Classmap')
     ->setClassMapDestination('src/acme/classmap')
     ->setClassMapName('AcmeClassmap')
-    ->setTypeMetadataOptions(
-        MetadataOptions::empty()
-            ->withTypesManipulator(new IntersectDuplicateTypesStrategy())
-    )
-    ->addRule(new Rules\AssembleRule(new Assembler\GetterAssembler(
-        (new Assembler\GetterAssemblerOptions())
-            ->withReturnType()
-            ->withBoolGetters()
+    ->addRule(new Rules\AssembleRule(new Assembler\GetterAssembler(new Assembler\GetterAssemblerOptions())))
+    ->addRule(new Rules\AssembleRule(new Assembler\ImmutableSetterAssembler(
+        new Assembler\ImmutableSetterAssemblerOptions()
     )))
-    ->addRule(new Rules\TypenameMatchesRule(
-        new Rules\AssembleRule(new Assembler\RequestAssembler()),
-        '/Request$/'
-    ))
-    ->addRule(new Rules\TypenameMatchesRule(
-        new Rules\AssembleRule(new Assembler\ResultAssembler()),
-        '/Response$/'
-    ))
+    ->addRule(
+        new Rules\IsRequestRule(
+            $engine->getMetadata(),
+            new Rules\MultiRule([
+                new Rules\AssembleRule(new Assembler\RequestAssembler()),
+                new Rules\AssembleRule(new Assembler\ConstructorAssembler(new Assembler\ConstructorAssemblerOptions())),
+            ])
+        )
+    )
+    ->addRule(
+        new Rules\IsResultRule(
+            $engine->getMetadata(),
+            new Rules\MultiRule([
+                new Rules\AssembleRule(new Assembler\ResultAssembler()),
+            ])
+        )
+    )
+    ->addRule(
+        new Rules\IsExtendingTypeRule(
+            $engine->getMetadata(),
+            new Rules\AssembleRule(new Assembler\ExtendingTypeAssembler())
+        )
+    )
+    ->addRule(
+        new Rules\IsAbstractTypeRule(
+            $engine->getMetadata(),
+            new Rules\AssembleRule(new Assembler\AbstractClassAssembler())
+        )
+    )
 ;
 ```
 
@@ -63,6 +80,29 @@ It is possible to change this to any other configuration you want to use
 and provide additional options like the preferred SOAP version.
 
 [Read more about engines.](https://github.com/php-soap/engine)
+
+```php
+use Phpro\SoapClient\Soap\EngineOptions;
+use Phpro\SoapClient\Soap\DefaultEngineFactory;
+
+DefaultEngineFactory::create(
+    EngineOptions::defaults($wsdl)
+        ->withWsdlLoader(new FlatteningLoader(new StreamWrapperLoader()))
+        ->withEncoderRegistry(
+            EncoderRegistry::default()
+                ->addClassMapCollection(SomeClassmap::types())
+                ->addBackedEnumClassMapCollection(SomeClassmap::enums())
+        )
+        // If you want to enable WSDL caching:
+        // ->withCache() 
+        // If you want to use Alternate HTTP settings:
+        // ->withWsdlLoader()
+        // ->withTransport()
+        // If you want specific SOAP setting:
+        // ->withWsdlParserContext()
+        // ->withWsdlServiceSelectionCriteria()
+);
+```
 
 **type destination**
 
@@ -128,3 +168,43 @@ Config::create()
         )
     )
 ```
+
+**Metadata manipulations**
+
+The metadata manipulations are a set of strategies that can be applied to the metadata before the code generation starts.
+You can read more about this in the documentation in the section [metadata](../drivers/metadata.md).
+
+Examples:
+
+```php
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\TypeReplacers;
+
+Config::create()
+    ->setDuplicateTypeIntersectStrategy(new IntersectDuplicateTypesStrategy())
+    ->setTypeReplacementStrategy(TypeReplacers::defaults()->add(new MyDateReplacer()));
+```
+
+**Enumeration options**
+
+You can configure how the code generator deals with XSD enumeration types.
+There are 2 type of XSD enumerations: 
+
+- `global`: Are available as a global simpletype inside the XSD.
+- `local`: Are configured as an internal type on an element or attribute and don't really have a name.
+
+The default behavior is to generate a PHP Enum for global enumerations only because
+We want to avoid naming conflicts with other types for local enumerations. 
+
+It is possible to opt-in into using these local enumerations as well:
+
+```php
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\CodeGenerator\Config\EnumerationGenerationStrategy;
+
+Config::create()
+    ->setEnumerationGenerationStrategy(EnumerationGenerationStrategy::LocalAndGlobal);
+```
+
+**Note**: This will dynamically add some extra type replacements and type manipulations to the metadata before the code generation starts.

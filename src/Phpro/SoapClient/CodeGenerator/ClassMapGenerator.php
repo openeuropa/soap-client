@@ -4,14 +4,13 @@ namespace Phpro\SoapClient\CodeGenerator;
 
 use Phpro\SoapClient\CodeGenerator\Context\ClassMapContext;
 use Phpro\SoapClient\CodeGenerator\Context\FileContext;
+use Phpro\SoapClient\CodeGenerator\Model\Type;
 use Phpro\SoapClient\CodeGenerator\Model\TypeMap;
 use Phpro\SoapClient\CodeGenerator\Rules\RuleSetInterface;
 use Laminas\Code\Generator\FileGenerator;
 
 /**
- * Class ClassMapGenerator
- *
- * @package Phpro\SoapClient\CodeGenerator
+ * @template-implements GeneratorInterface<TypeMap>
  */
 class ClassMapGenerator implements GeneratorInterface
 {

@@ -7,6 +7,7 @@ use Laminas\Code\Generator\ParameterGenerator;
 use Phpro\SoapClient\Caller\EngineCaller;
 use Phpro\SoapClient\Caller\EventDispatchingCaller;
 use Phpro\SoapClient\CodeGenerator\Context\ClientFactoryContext;
+use Phpro\SoapClient\CodeGenerator\Model\Type;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
 use Phpro\SoapClient\Soap\EngineOptions;
 use Soap\Encoding\EncoderRegistry;
@@ -16,9 +17,7 @@ use Laminas\Code\Generator\FileGenerator;
 use Laminas\Code\Generator\MethodGenerator;
 
 /**
- * Class ClientBuilderGenerator
- *
- * @package Phpro\SoapClient\CodeGenerator
+ * @template-implements GeneratorInterface<ClientFactoryContext>
  */
 class ClientFactoryGenerator implements GeneratorInterface
 {
@@ -26,9 +25,9 @@ class ClientFactoryGenerator implements GeneratorInterface
 \$engine = DefaultEngineFactory::create(
     EngineOptions::defaults(\$wsdl)
         ->withEncoderRegistry(
-            EncoderRegistry::default()->addClassMapCollection(
-                %2\$s::getCollection()
-            )
+            EncoderRegistry::default()
+                ->addClassMapCollection(%2\$s::types())
+                ->addBackedEnumClassMapCollection(%2\$s::enums())
         )
         // If you want to enable WSDL caching:
         // ->withCache() 

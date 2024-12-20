@@ -13,9 +13,10 @@ final class TypeNameCalculator
     {
         $meta = $type->getMeta();
         $isSimpleType = $meta->isSimple()->unwrapOr(false);
+        $isGlobalEnum = $isSimpleType && $meta->enums()->isSome() && !$meta->isLocal()->unwrapOr(false);
 
-        // For non-simple types, we always want to use the name of the type.
-        if (!$isSimpleType) {
+        // For non-simple types or backed enums, we always want to use the name of the type.
+        if (!$isSimpleType || $isGlobalEnum) {
             return $type->getName();
         }
 

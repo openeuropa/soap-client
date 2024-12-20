@@ -2,6 +2,8 @@
 
 namespace Phpro\SoapClient\CodeGenerator\Util;
 
+use function Psl\Result\try_catch;
+use function Psl\Type\int;
 use function Psl\Type\non_empty_string;
 
 /**
@@ -207,6 +209,33 @@ class Normalizer
     public static function normalizeProperty(string $property): string
     {
         return self::camelCase($property, '{[^a-z0-9_]+}i');
+    }
+
+    /**
+     * @param non-empty-string $emptyCase
+     * @param non-empty-string $conflictPrefix
+     * @return non-empty-string
+     */
+    public static function normalizeEnumCaseName(
+        string $value,
+        string $emptyCase = 'Empty',
+        string $conflictPrefix = 'Value_',
+        string $minusPrefix = 'Minus_',
+    ): string {
+        if ($value === '') {
+            return $emptyCase;
+        }
+
+        if (is_numeric($value)) {
+            return $conflictPrefix . str_replace('-', $minusPrefix, $value);
+        }
+
+        $normalized = self::normalizeProperty($value);
+        if (preg_match('/^[0-9]/', $normalized)) {
+            $normalized = $conflictPrefix.$normalized;
+        }
+
+        return $normalized;
     }
 
     /**

@@ -5,13 +5,12 @@ namespace Phpro\SoapClient\CodeGenerator;
 use Phpro\SoapClient\CodeGenerator\Config\Config;
 use Phpro\SoapClient\CodeGenerator\Context\ConfigContext;
 use Laminas\Code\Generator\FileGenerator;
+use Phpro\SoapClient\CodeGenerator\Model\Type;
 use Phpro\SoapClient\Soap\DefaultEngineFactory;
 use Phpro\SoapClient\Soap\EngineOptions;
 
 /**
- * Class ConfigGenerator
- *
- * @package Phpro\SoapClient\CodeGenerator
+ * @template-implements GeneratorInterface<ConfigContext>
  */
 class ConfigGenerator implements GeneratorInterface
 {
