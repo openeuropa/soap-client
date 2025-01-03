@@ -61,10 +61,17 @@ use Soap\Encoding\ClassMap\ClassMap;
 
 class MyClassMap
 {
-    public static function getCollection() : \Soap\Encoding\ClassMap\ClassMapCollection
+    public static function types() : \Soap\Encoding\ClassMap\ClassMapCollection
     {
         return new ClassMapCollection(
             new ClassMap('http://my-namespace.com', 'MyType', Type\MyType::class),
+        );
+    }
+
+    public static function enums() : \Soap\Encoding\ClassMap\ClassMapCollection
+    {
+        return new ClassMapCollection(
+            new ClassMap('http://my-namespace.com', 'MyEnum', Type\MyEnum::class),
         );
     }
 }
@@ -93,6 +100,19 @@ CODE;
                 ],
                 (new XsdType('MyType'))
                     ->withXmlNamespace('http://my-namespace.com')
+            ),
+            new Type(
+                $namespace,
+                'MyEnum',
+                'MyEnum',
+                [],
+                (new XsdType('MyEnum'))
+                    ->withXmlNamespace('http://my-namespace.com')
+                    ->withMeta(
+                        static fn (TypeMeta $meta) => $meta
+                            ->withIsSimple(true)
+                            ->withEnums(['value1', 'value2'])
+                    )
             ),
         ]);
 

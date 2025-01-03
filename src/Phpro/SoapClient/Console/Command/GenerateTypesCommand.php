@@ -2,6 +2,9 @@
 
 namespace Phpro\SoapClient\Console\Command;
 
+use Phpro\SoapClient\CodeGenerator\Config\Config;
+use Phpro\SoapClient\CodeGenerator\EnumerationGenerator;
+use Phpro\SoapClient\CodeGenerator\GeneratorInterface;
 use Phpro\SoapClient\CodeGenerator\Model\Type;
 use Phpro\SoapClient\CodeGenerator\Model\TypeMap;
 use Phpro\SoapClient\CodeGenerator\TypeGenerator;
@@ -77,12 +80,11 @@ class GenerateTypesCommand extends Command
             non_empty_string()->assert($config->getTypeNamespace()),
             $config->getManipulatedMetadata()->getTypes(),
         );
-        $generator = new TypeGenerator($config->getRuleSet());
 
         $typesDestination = non_empty_string()->assert($config->getTypeDestination());
         foreach ($typeMap->getTypes() as $type) {
             $fileInfo = $type->getFileInfo($typesDestination);
-            if ($this->handleType($generator, $type, $fileInfo)) {
+            if ($this->handleType($config, $type, $fileInfo)) {
                 $this->output->writeln(
                     sprintf('Generated class %s to %s', $type->getFullName(), $fileInfo->getPathname())
                 );
@@ -95,17 +97,28 @@ class GenerateTypesCommand extends Command
     }
 
     /**
-     * Try to create a class for a type.
-     *
-     * @param TypeGenerator $generator
-     * @param Type $type
-     * @param SplFileInfo $fileInfo
-     * @return bool
+     * @return GeneratorInterface<Type>|null
      */
-    protected function handleType(TypeGenerator $generator, Type $type, SplFileInfo $fileInfo): bool
+    private function detectCodeGeneratorForType(Config $config, Type $type): ?GeneratorInterface
     {
-        // Skip generation of simple types.
-        if ((new IsConsideredScalarType())($type->getMeta())) {
+        $isConsideredScalar = (new IsConsideredScalarType())($type->getMeta());
+
+        return match (true) {
+            $isConsideredScalar && $type->getMeta()->enums()->isSome() => new EnumerationGenerator(),
+            !$isConsideredScalar => new TypeGenerator($config->getRuleSet()),
+            default => null
+        };
+    }
+
+    /**
+     * Try to create a class for a type.
+     */
+    protected function handleType(Config $config, Type $type, SplFileInfo $fileInfo): bool
+    {
+        $generator = $this->detectCodeGeneratorForType($config, $type);
+
+        // Skip generation of "simple" types without generator.
+        if (!$generator) {
             if ($this->output->isVeryVerbose()) {
                 $this->output->writeln('<fg=yellow>Skipped scalar type : '.$type->getFullName().'</fg=yellow>');
             }
@@ -132,15 +145,14 @@ class GenerateTypesCommand extends Command
     }
 
     /**
-     * Generates one type class
-     *
-     * @param FileGenerator $file
-     * @param TypeGenerator $generator
-     * @param Type $type
-     * @param SplFileInfo $fileInfo
+     * @param GeneratorInterface<Type> $generator
      */
-    protected function generateType(FileGenerator $file, TypeGenerator $generator, Type $type, SplFileInfo $fileInfo)
-    {
+    protected function generateType(
+        FileGenerator $file,
+        GeneratorInterface $generator,
+        Type $type,
+        SplFileInfo $fileInfo
+    ): void {
         $code = $generator->generate($file, $type);
         $this->filesystem->putFileContents($fileInfo->getPathname(), $code);
     }

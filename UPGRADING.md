@@ -54,9 +54,9 @@ Change the engine inside your (generated) ClientFactory:
 $engine = DefaultEngineFactory::create(
     EngineOptions::defaults($wsdl)
         ->withEncoderRegistry(
-            EncoderRegistry::default()->addClassMapCollection(
-                CalcClassmap::getCollection()
-            )
+            EncoderRegistry::default()
+                ->addClassMapCollection(CalcClassmap::types())
+                ->addBackedEnumClassMapCollection(CalcClassmap::enums())
         )
         // If you want to enable WSDL caching:
         // ->withCache($yourPsr6CachePool)

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer;
 
 use Soap\Engine\Metadata\Model\XsdType;
-use function Psl\Fun\pipe;
 use function Psl\Iter\reduce;
 
 final class TypeReplacers implements TypeReplacer
@@ -17,7 +16,7 @@ final class TypeReplacers implements TypeReplacer
     /**
      * @no-named-arguments
      */
-    private function __construct(TypeReplacer ...$replacers)
+    public function __construct(TypeReplacer ...$replacers)
     {
         $this->replacers = $replacers;
     }

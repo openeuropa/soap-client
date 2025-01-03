@@ -12,9 +12,7 @@ use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\FileGenerator;
 
 /**
- * Class TypeGenerator
- *
- * @package Phpro\SoapClient\CodeGenerator
+ * @template-implements GeneratorInterface<Type>
  */
 class TypeGenerator implements GeneratorInterface
 {

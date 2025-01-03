@@ -15,9 +15,7 @@ use Laminas\Code\Generator\ClassGenerator;
 use Laminas\Code\Generator\FileGenerator;
 
 /**
- * Class ClientGenerator
- *
- * @package Phpro\SoapClient\CodeGenerator
+ * @template-implements GeneratorInterface<Client>
  */
 class ClientGenerator implements GeneratorInterface
 {

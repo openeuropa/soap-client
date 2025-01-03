@@ -13,7 +13,6 @@ use Soap\Wsdl\Loader\FlatteningLoader;
 use Soap\Wsdl\Loader\StreamWrapperLoader;
 use Soap\Wsdl\Loader\WsdlLoader;
 use Soap\WsdlReader\Locator\ServiceSelectionCriteria;
-use Soap\WsdlReader\Model\Definitions\SoapVersion;
 use Soap\WsdlReader\Parser\Context\ParserContext;
 use function Psl\Option\from_nullable;
 

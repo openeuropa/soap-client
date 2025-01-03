@@ -9,8 +9,11 @@ use Phpro\SoapClient\CodeGenerator\Rules\RuleSet;
 use Phpro\SoapClient\CodeGenerator\Rules\RuleSetInterface;
 use Phpro\SoapClient\CodeGenerator\Util\Normalizer;
 use Phpro\SoapClient\Exception\InvalidArgumentException;
+use Phpro\SoapClient\Soap\Metadata\Detector\LocalEnumDetector;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\DuplicateTypes\IntersectDuplicateTypesStrategy;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\MethodsManipulatorChain;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\LocalToGlobalEnumReplacer;
+use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\AppendTypesManipulator;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\ReplaceMethodTypesManipulator;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\ReplaceTypesManipulator;
 use Phpro\SoapClient\Soap\Metadata\Manipulators\TypeReplacer\TypeReplacer;
@@ -20,6 +23,7 @@ use Phpro\SoapClient\Soap\Metadata\Manipulators\TypesManipulatorInterface;
 use Phpro\SoapClient\Soap\Metadata\MetadataFactory;
 use Phpro\SoapClient\Soap\Metadata\MetadataOptions;
 use Soap\Engine\Engine;
+use Soap\Engine\Metadata\Collection\TypeCollection;
 use Soap\Engine\Metadata\Metadata;
 
 final class Config
@@ -58,7 +62,7 @@ final class Config
 
     protected TypeReplacer $typeReplacementStrategy;
 
-    protected ?MetadataOptions $metadataOptions;
+    protected ?MetadataOptions $metadataOptions = null;
 
     /**
      * @var RuleSetInterface
@@ -80,6 +84,8 @@ final class Config
      */
     protected $classMapDestination;
 
+    protected EnumerationGenerationStrategy $enumerationGenerationStrategy;
+
     public function __construct()
     {
         $this->typeReplacementStrategy = TypeReplacers::defaults();
@@ -88,6 +94,9 @@ final class Config
         // Therefore, we decided to combine all duplicate types into 1 big intersected type by default instead.
         // The resulting type will always be usable, but might contain some additional empty properties.
         $this->duplicateTypeIntersectStrategy = new IntersectDuplicateTypesStrategy();
+
+        // By default, we only generate global enumerations to avoid naming conflicts.
+        $this->enumerationGenerationStrategy = EnumerationGenerationStrategy::default();
 
         $this->ruleSet = new RuleSet([
             new Rules\AssembleRule(new Assembler\PropertyAssembler()),
@@ -270,15 +279,28 @@ final class Config
 
     public function getMetadataOptions(): MetadataOptions
     {
-        return $this->metadataOptions ?? MetadataOptions::empty()
+        if ($this->metadataOptions) {
+            return $this->metadataOptions;
+        }
+
+        $typeReplacementStrategy = $this->typeReplacementStrategy;
+        $appendTypes = static fn () => new TypeCollection();
+
+        if ($this->enumerationGenerationStrategy === EnumerationGenerationStrategy::LocalAndGlobal) {
+            $typeReplacementStrategy = new TypeReplacers($typeReplacementStrategy, new LocalToGlobalEnumReplacer());
+            $appendTypes = new LocalEnumDetector();
+        }
+
+        return MetadataOptions::empty()
             ->withTypesManipulator(
                 new TypesManipulatorChain(
+                    new AppendTypesManipulator($appendTypes),
                     $this->duplicateTypeIntersectStrategy,
-                    new ReplaceTypesManipulator($this->typeReplacementStrategy),
+                    new ReplaceTypesManipulator($typeReplacementStrategy),
                 )
             )->withMethodsManipulator(
                 new MethodsManipulatorChain(
-                    new ReplaceMethodTypesManipulator($this->typeReplacementStrategy)
+                    new ReplaceMethodTypesManipulator($typeReplacementStrategy)
                 )
             );
     }
@@ -379,5 +401,17 @@ final class Config
         $this->classMapDestination = $classMapDestination;
 
         return $this;
+    }
+
+    public function setEnumerationGenerationStrategy(EnumerationGenerationStrategy $enumerationGenerationStrategy): self
+    {
+        $this->enumerationGenerationStrategy = $enumerationGenerationStrategy;
+
+        return $this;
+    }
+
+    public function getEnumerationGenerationStrategy(): EnumerationGenerationStrategy
+    {
+        return $this->enumerationGenerationStrategy;
     }
 }
