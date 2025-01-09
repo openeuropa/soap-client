@@ -11,6 +11,7 @@ use Soap\Engine\Metadata\Collection\PropertyCollection;
 use Soap\Engine\Metadata\Collection\TypeCollection;
 use Soap\Engine\Metadata\Model\Property;
 use Soap\Engine\Metadata\Model\Type;
+use Soap\Engine\Metadata\Model\TypeMeta;
 use Soap\Engine\Metadata\Model\XsdType;
 
 class IntersectDuplicateTypesStrategyTest extends TestCase
@@ -29,9 +30,10 @@ class IntersectDuplicateTypesStrategyTest extends TestCase
             new Type(XsdType::create('file'), new PropertyCollection(
                 new Property('prop1', XsdType::create('string')),
                 new Property('prop3', XsdType::create('string')),
+                new Property('prop4', XsdType::create('string')),
             )),
             new Type(XsdType::create('file'), new PropertyCollection(
-                new Property('prop1', XsdType::create('string')),
+                new Property('prop1', XsdType::create('int')),
                 new Property('prop2', XsdType::create('string')),
             )),
             new Type(XsdType::create('uppercased'), new PropertyCollection()),
@@ -44,14 +46,16 @@ class IntersectDuplicateTypesStrategyTest extends TestCase
         );
 
         $manipulated = $strategy($types);
+        $nullable = static fn(TypeMeta $meta) => $meta->withIsNullable(true);
 
         self::assertInstanceOf(TypeCollection::class, $manipulated);
         self::assertEquals(
             [
                 new Type(XsdType::create('file'), new PropertyCollection(
-                    new Property('prop1', XsdType::create('string')),
-                    new Property('prop3', XsdType::create('string')),
-                    new Property('prop2', XsdType::create('string')),
+                    new Property('prop1', XsdType::create('int')),
+                    new Property('prop3', XsdType::create('string')->withMeta($nullable)),
+                    new Property('prop4', XsdType::create('string')->withMeta($nullable)),
+                    new Property('prop2', XsdType::create('string')->withMeta($nullable)),
                 )),
                 new Type(XsdType::create('uppercased'), new PropertyCollection()),
                 new Type(XsdType::create('with-specialchar'), new PropertyCollection()),

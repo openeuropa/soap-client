@@ -10,7 +10,15 @@ use Soap\Engine\Metadata\Collection\PropertyCollection;
 use Soap\Engine\Metadata\Collection\TypeCollection;
 use Soap\Engine\Metadata\Model\Property;
 use Soap\Engine\Metadata\Model\Type;
+use Soap\Engine\Metadata\Model\TypeMeta;
+use function Psl\Iter\contains;
+use function Psl\Iter\first;
+use function Psl\Iter\reduce;
+use function Psl\Type\instance_of;
 use function Psl\Type\non_empty_string;
+use function Psl\Vec\flat_map;
+use function Psl\Vec\map;
+use function Psl\Vec\values;
 
 final class IntersectDuplicateTypesStrategy implements TypesManipulatorInterface
 {
@@ -36,14 +44,12 @@ final class IntersectDuplicateTypesStrategy implements TypesManipulatorInterface
 
     private function intersectTypes(TypeCollection $duplicateTypes): Type
     {
+        $type = instance_of(Type::class)->assert(first($duplicateTypes));
+
         return new Type(
-            current(iterator_to_array($duplicateTypes))->getXsdType(),
+            $type->getXsdType(),
             $this->uniqueProperties(
-                new PropertyCollection(...array_merge(
-                    ...$duplicateTypes->map(
-                        static fn (Type $type): array => iterator_to_array($type->getProperties())
-                    )
-                ))
+                ...map($duplicateTypes, static fn (Type $type) => $type->getProperties())
             )
         );
     }
@@ -55,13 +61,43 @@ final class IntersectDuplicateTypesStrategy implements TypesManipulatorInterface
         });
     }
 
-    private function uniqueProperties(PropertyCollection $props): PropertyCollection
+    private function uniqueProperties(PropertyCollection ...$types): PropertyCollection
     {
-        return new PropertyCollection(...array_values(
-            array_combine(
-                $props->map(static fn (Property $prop) => $prop->getName()),
-                iterator_to_array($props)
+        $allProps = flat_map($types, static fn (PropertyCollection $props) => $props);
+        $typePropNames = map(
+            $types,
+            static fn (PropertyCollection $props): array => $props->map(static fn (Property $prop) => $prop->getName())
+        );
+        $intersectedPropNames = array_intersect(...$typePropNames);
+
+        return new PropertyCollection(
+            ...values(
+                reduce(
+                    $allProps,
+                    /**
+                     * @param array<string, Property> $result
+                     *
+                     * @return array<string, Property>
+                     */
+                    static function (array $result, Property $prop) use ($intersectedPropNames): array {
+                        $result[$prop->getName()] = new Property(
+                            $prop->getName(),
+                            $prop->getType()->withMeta(
+                                static function (TypeMeta $meta) use ($prop, $intersectedPropNames): TypeMeta {
+                                    if (contains($intersectedPropNames, $prop->getName())) {
+                                        return $meta;
+                                    }
+
+                                    return $meta->withIsNullable(true);
+                                }
+                            )
+                        );
+
+                        return $result;
+                    },
+                    []
+                )
             )
-        ));
+        );
     }
 }
