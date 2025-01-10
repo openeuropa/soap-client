@@ -19,6 +19,7 @@ to generate the code you want to add to the generated SOAP types.
 - [IteratorAssembler](#iteratorassembler)
 - [JsonSerializableAssembler](#jsonserializableassembler)
 - [PropertyAssembler](#propertyassembler)
+- [PropertyDefaultsAssembler](#propertydefaultsassembler)
 - [RequestAssembler](#requestassembler)
 - [ResultAssembler](#resultassembler)
 - [ResultProviderAssembler](#resultproviderassembler)
@@ -317,6 +318,19 @@ new PropertyAssembler(PropertyGenerator::VISIBILITY_PROTECTED)
 Please note that the default ruleset has a visibility of private.
 If you want to override this, you will have to override all rules by calling `Phpro\SoapClient\CodeGenerator\Config\Config::setRuleSet`.
 
+## PropertyDefaultsAssembler
+
+This `PropertyDefaultsAssembler` can be used together with the default `PropertyAssembler` and can be used to determine basic default values for specific properties.
+It adds default values for following scalar types: `string`, `int`, `float`, `bool`, `array`, `mixed`.
+
+Example output:
+
+```php
+    /**
+     * @var string
+     */
+    private $prop1 = '';
+```
 
 ## RequestAssembler
 
